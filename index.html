@@ -211,8 +211,21 @@
             </form>
         </div>
 
-<!-- ------------------------- -->
 
+
+
+
+
+
+        <!-- ------------------------- -->
+
+
+
+
+
+
+
+        
         <div class="row">
             <form class="form-horizontal d-none" name="frmBuscarcategoria" id="frmBuscarcategoria">
                 <fieldset>
@@ -231,12 +244,73 @@
                     <div class="form-group">
                         <label class="col-xs-4 control-label" for="btnAceptarBuscarCategoria"></label>
                         <div class="col-xs-4">
-                            <input type="button" id="btnAceptarBuscarCategoria" name="btnAceptarBuscarCategoria" class="btn btn-primary" value="Aceptar" />
+                            <input type="button" id="btnAceptarBuscarCategoria" name="btnAceptarBuscarCategoria"
+                                class="btn btn-primary" value="Aceptar" />
                         </div>
                     </div>
                 </fieldset>
             </form>
 
+        </div>
+
+
+
+
+
+
+
+
+<!-- --------------------------------------- -->
+
+
+
+
+
+
+
+
+
+        <div class="row">
+            <form class="form-horizontal d-none" name="frmBuscarcategoriaPF" id="frmBuscarcategoriaPF">
+
+                <fieldset>
+                    <legend>Buscar categorías por fecha de creación</legend>
+
+                    <!-- Seleccionar condición -->
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="condicion">
+                            Buscar categorías creadas:
+                        </label>
+
+                        <div class="col-xs-4">
+                            <select class="form-control" name="condicion" id="condicion" required>
+                                <option value="antes">Antes de</option>
+                                <option value="despues">Después de</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Seleccionar fecha -->
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="fecha">
+                            Fecha:
+                        </label>
+
+                        <div class="col-xs-4">
+                            <input type="date" class="form-control" name="fecha" id="fecha" required />
+                        </div>
+                    </div>
+
+                    <!-- Botón buscar -->
+                    <div class="form-group">
+                        <div class="col-xs-offset-4 col-xs-4">
+                            <input type="button" id="btnBuscar" name="btnBuscar" class="btn btn-primary"
+                                value="Buscar categorías" />
+                        </div>
+                    </div>
+
+                </fieldset>
+            </form>
         </div>
 
 
@@ -251,6 +325,7 @@
         <div id="listados"></div>
 
     </div>
+    <script type="text/javascript" src="js/ajax.js"></script>
     <script type="text/javascript" src="js/objetos.js"></script>
     <script type="text/javascript" src="js/codigo.js"></script>
 </body>

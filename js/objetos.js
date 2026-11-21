@@ -75,7 +75,7 @@ class Categoria {
     }
 
     toJSON() {
-        let oTipo = {
+        let oCategoria = {
             id: this.#id,
             nombre: this.#nombre,
             descripcion: this.#descripcion,
@@ -84,45 +84,40 @@ class Categoria {
             activa: this.#activa,
             fecha_creacion: this.#fecha_creacion,
         };
-        return oTipo;
+        return oCategoria;
     }
 
 }
 
 
 class Empresa {
-    async listadoTipoCategoria() {
-        let listado = "";
 
-        let respuesta = await peticionGET("get_categorias.php", new FormData());
-
-        if (!respuesta.ok) {
-            listado = respuesta.mensaje;
-        } else {
-            listado = "<table class='table table-striped'>";
-            listado +=
-                "<thead><tr><th>IDCategorias</th><th>NOMBRE</th><th>DESCRIPCION</th><th>ORDEN</th><th>FECHA_CREACION</th><th>ACTIVA</th><th>DIFICULTAD</th><th>ACCIONES</th></tr></thead>";
-            listado += "<tbody>";
-
-            for (let tipo of respuesta.datos) {
-                listado += "<tr><td>" + tipo.id + "</td>";
-                listado += "<td>" + tipo.nombre + "</td>";
-                listado += "<td>" + tipo.descripcion + "</td></tr>";
-                listado += "<td>" + tipo.dificultad_id + "</td></tr>";
-                listado += "<td>" + tipo.orden + "</td></tr>";
-                listado += "<td>" + tipo.activa + "</td></tr>";
-                listado += "<td>" + tipo.fecha_creacion + "</td></tr>";
-            }
-            listado += "</tbody></table>";
-        }
-
-        return listado;
-
-    }
-    
     async listadoCategoria() {
 
         let respuesta = await peticionGET("get_categorias.php");
+
+        return respuesta;
+    }
+
+    async altaCategoria(oCategoria) {
+        let datos = new FormData();
+
+        datos.append("id", oCategoria.id);
+        datos.append("nombre", oCategoria.nombre);
+        datos.append("descripcion", oCategoria.descripcion);
+        datos.append("dificultad_id", oCategoria.dificultad_id);
+        datos.append("orden", oCategoria.orden);
+        datos.append("activa", oCategoria.activa);
+        datos.append("fecha_creacion", oCategoria.fecha_creacion);
+
+        let respuesta = await peticionPOST("alta_categoria.php", datos);
+
+        return respuesta;
+    }
+    async getDificultad() {
+        // let datos = new FormData();
+
+        let respuesta = await peticionGET("get_dificultad.php");
 
         return respuesta;
     }
