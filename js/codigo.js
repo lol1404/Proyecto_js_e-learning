@@ -2,6 +2,8 @@
 
 registrarEventos();
 
+var oEmpresa = new Empresa();
+
 
 function registrarEventos() {
     document
@@ -15,7 +17,7 @@ function registrarEventos() {
 
     document
         .querySelector("#mnuBuscarC")
-        .addEventListener("click", mostrarFormulario);
+        .addEventListener("click", procesarListadoCategorias);
 
 }
 
@@ -41,13 +43,27 @@ function ocultarFormularios() {
 
 }
 
-async function procesarListadoCategoria() {
-
+async function procesarListadoCategorias() {
+    // Obtener el listado de componentes
     let respuesta = await oEmpresa.listadoCategoria();
 
+    let listado = '<table class="table table-striped">';
+    listado +=
+        "<thead><tr><th>IDCategorias</th><th>NOMBRE</th><th>DESCRIPCION</th><th>ORDEN</th><th>FECHA_CREACION</th><th>ACTIVA</th><th>DIFICULTAD</th><th>ACCIONES</th></tr></thead>";
+    listado += "<tbody>";
 
+    for (let fila of respuesta.datos) {
+        listado += "<tr><td>" + tipo.id + "</td>";
+        listado += "<td>" + tipo.nombre + "</td>";
+        listado += "<td>" + tipo.descripcion + "</td></tr>";
+        listado += "<td>" + tipo.dificultad_id + "</td></tr>";
+        listado += "<td>" + tipo.orden + "</td></tr>";
+        listado += "<td>" + tipo.activa + "</td></tr>";
+        listado += "<td>" + tipo.fecha_creacion + "</td></tr>";
+    }
 
+    listado += "</tbody></table>";
 
-
-
+    // Agregamos el contenido a la capa de listados
+    document.querySelector("#listados").innerHTML = listado;
 }
