@@ -2,6 +2,7 @@
 
 registrarEventos();
 
+
 function registrarEventos() {
     document
         .querySelector("#limpiar")
@@ -10,6 +11,10 @@ function registrarEventos() {
     // dropdown --------------------
     document
         .querySelector("#mnuAltaC")
+        .addEventListener("click", mostrarFormulario);
+
+    document
+        .querySelector("#mnuBuscarC")
         .addEventListener("click", mostrarFormulario);
 
 }
@@ -23,10 +28,26 @@ function mostrarFormulario(oEvento) {
         case "mnuAltaC":
             frmAltacategoria.classList.remove("d-none");
             break;
-
+        case "mnuBuscarC":
+            frmBuscarcategoria.classList.remove("d-none");
+            break;
     }
 }
 
 function ocultarFormularios() {
     frmAltacategoria.classList.add("d-none");
+
+    frmBuscarcategoria.classList.add("d-none");
+
+}
+
+async function procesarListadoCategoria() {
+
+    let respuesta = await oEmpresa.listadoCategoria();
+
+
+
+
+
+
 }

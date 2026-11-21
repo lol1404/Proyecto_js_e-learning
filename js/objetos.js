@@ -24,6 +24,7 @@ class Categoria {
         this.#activa = activa
         this.#fecha_creacion = fecha_creacion
     }
+
     get id() {
         return this.#id;
     }
@@ -73,9 +74,6 @@ class Categoria {
         this.#fecha_creacion = fecha_creacion;
     }
 
-
-
-
     toJSON() {
         let oTipo = {
             id: this.#id,
@@ -89,4 +87,14 @@ class Categoria {
         return oTipo;
     }
 
+}
+
+
+class Empresa {
+    async listadoTipoCategoria() {
+        let listado = "";
+
+        let respuesta = await peticionGET("get_categorias.php", new FormData());
+        
+    }
 }

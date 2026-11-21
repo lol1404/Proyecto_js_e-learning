@@ -46,7 +46,8 @@
 
                             <li><a class="dropdown-item" href="#" id="mnuBuscarC">Buscar una categoria</a></li>
                             <li><a class="dropdown-item" href="#" id="mnuListC">Listado de categorias</a></li>
-                            <li><a class="dropdown-item" href="#" id="mnuListPFC">Listado de categorias por fecha</a></li>
+                            <li><a class="dropdown-item" href="#" id="mnuListPFC">Listado de categorias por fecha</a>
+                            </li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
@@ -130,6 +131,20 @@
             </div>
         </div>
     </nav>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     <div class="container" id="formularios">
         <div class="row">
             <form class="form-horizontal d-none" name="frmAltacategoria" id="frmAltacategoria">
@@ -195,6 +210,46 @@
                 </fieldset>
             </form>
         </div>
+
+<!-- ------------------------- -->
+
+        <div class="row">
+            <form class="form-horizontal d-none" name="frmBuscarcategoria" id="frmBuscarcategoria">
+                <fieldset>
+                    <!-- Form Name -->
+                    <legend>Buscar una categoria</legend>
+                    <!-- Text input-->
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="txtNombreCategoria">Nombre</label>
+                        <div class="col-xs-4">
+                            <input id="txtNombreCategoria" name="txtNombreCategoria"
+                                placeholder="Nombre de la categoria" class="form-control input-md" type="text">
+                        </div>
+                    </div>
+
+                    <!-- Button -->
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="btnAceptarBuscarCategoria"></label>
+                        <div class="col-xs-4">
+                            <input type="button" id="btnAceptarBuscarCategoria" name="btnAceptarBuscarCategoria" class="btn btn-primary" value="Aceptar" />
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+
+        </div>
+
+
+
+
+
+        <!-- nuevo form -->
+
+
+
+
+
+
     </div>
     <script type="text/javascript" src="js/objetos.js"></script>
     <script type="text/javascript" src="js/codigo.js"></script>
