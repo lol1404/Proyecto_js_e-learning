@@ -7,7 +7,7 @@ try {
     $conexion = obtenerConexion();
 
     // Consulta simple — en este caso no hay parámetros externos
-    $sql = "SELECT * FROM categorias;";
+    $sql = "SELECT categorias.*,dificultades.nombre as dificultad  FROM categorias JOIN dificultades WHERE dificultades.id = categorias.dificultad_id;";
     $resultado = $conexion->query($sql);
 
     // Recolectamos las filas en un array asociativo para serializar a JSON

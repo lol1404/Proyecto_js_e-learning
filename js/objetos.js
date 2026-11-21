@@ -121,4 +121,34 @@ class Empresa {
 
         return respuesta;
     }
+
+    async buscarCategoria(NombreCategoria) {
+        let datos = new FormData();
+        datos.append("nombre", NombreCategoria);
+
+        let respuesta = await peticionGET("get_buscar_categorias.php", datos);
+
+        return respuesta;
+    }
+
+    async buscarCategoriaPF(FechaCategoria, cuando) {
+        let datos = new FormData();
+        datos.append("fecha", FechaCategoria);
+        datos.append("cuando", cuando);
+
+        let respuesta = await peticionGET("get_buscar_categorias.php", datos);
+
+        return respuesta;
+    }
+
+    editarCategoria(boton) {
+    let categoria = JSON.parse(boton.dataset.categoria);
+
+    ocultarFormularios();
+    frmModificarcategoria.classList.remove("d-none");
+
+    frmModificarcategoria.txtModId.value = categoria.id;
+    frmModificarcategoria.txtModNombre.value = categoria.nombre;
+    // ... resto de campos
+}
 }
