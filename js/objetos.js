@@ -302,6 +302,8 @@ class Empresa {
         await actualizarDesplegableDificultad(categoria.dificultad_id);
     }
 
+
+
     async getCategoriasCursos() {
 
         let respuesta = await peticionGET("get_categorias_cursos.php");
@@ -326,6 +328,35 @@ class Empresa {
         datos.append("fecha_publicacion", oCurso.fecha_publicacion);
 
         let respuesta = await peticionPOST("alta_curso.php", datos);
+
+        return respuesta;
+    }
+
+
+
+    async buscarCurso(curso) {
+        let datos = new FormData();
+        datos.append("curso", curso);
+
+        let respuesta = await peticionGET("get_buscar_cursos.php", datos);
+
+        return respuesta;
+    }
+
+    async buscarCursosCategoria(categoria) {
+        let datos = new FormData();
+        datos.append("categoria", categoria);
+
+        let respuesta = await peticionGET("get_buscar_cursos.php", datos);
+
+        return respuesta;
+    }
+
+
+
+    async listadoCursos() {
+
+        let respuesta = await peticionGET("get_cursos.php");
 
         return respuesta;
     }

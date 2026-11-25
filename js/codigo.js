@@ -44,9 +44,9 @@ function registrarEventos() {
         .querySelector("#mnuListadoCursoCategoria")
         .addEventListener("click", mostrarFormulario);
 
-    //document
-      //  .querySelector("#mnuListadoCurso")
-        //.addEventListener("click", procesarListadoCursos);
+    document
+        .querySelector("#mnuListadoCurso")
+        .addEventListener("click", procesarListadoCursos);
 
     // Botones --------------------
 
@@ -287,9 +287,6 @@ async function procesarBuscarCategorias(fecha) {
         respuesta = await oEmpresa.buscarCategoria(aBuscar);
     }
 
-
-
-
     listados.classList.remove("d-none");
 
     let listado = '<table class="table table-striped" id="tablaCategorias">';
@@ -456,3 +453,105 @@ function validarAltaCurso() {
 
     return true;
 }
+
+
+
+
+
+async function procesarBuscarCurso(categoria) {
+    let respuesta;
+
+    if (categoria) {
+        let categoriaABuscar = frmBuscarcursocategoria.lstCategoria.value.trim();
+        // Obtener el listado de componentes por categoria
+        respuesta = await oEmpresa.buscarCursosCategoria(categoriaABuscar);
+
+    } else {
+        let aBuscar = frmBuscarcurso.txtTituloCurso.value.trim();
+        // Obtener el listado de componentes
+        respuesta = await oEmpresa.buscarCurso(aBuscar);
+    }
+
+    listados.classList.remove("d-none");
+
+    let listado = '<table class="table table-striped" id="tablaCursos">';
+    listado +=
+        "<thead><tr><th>ID</th><th>CATEGORIA</th><th>TITULO</th><th>DESCRIPCION</th><th>NIVEL</th><th>DURACION(h)</th><th>PRECIO</th><th>PUBLICADO</th><th>FECHA PUBLICACIO</th><th>ACCIONES</th></tr></thead>";
+    listado += "<tbody>";
+
+    for (let fila of respuesta.datos) {
+    listado += "<tr><td>" + fila.id + "</td>";
+    listado += "<td>" + fila.categorias + "</td>";
+    listado += "<td>" + fila.titulo + "</td>";
+    listado += "<td>" + fila.descripcion + "</td>";
+    listado += "<td>" + fila.nivel + "</td>";
+    listado += "<td>" + fila.duracion_horas + "</td>";
+    listado += "<td>" + fila.precio + "</td>";
+
+    if (parseInt(fila.publicado) === 1) {
+        listado += "<td class='table-success'>SI</td>";
+    } else {
+        listado += "<td class='table-danger'>NO</td>";
+    }
+
+    listado += "<td>" + (fila.fecha_publicacion ?? "") + "</td>";
+
+    listado +=
+        "<td>" +
+        "<button class='btn btn-primary btn-editar' data-curso='" + JSON.stringify(fila) + "'>" +
+        "<i class='bi bi-pencil-square'></i></button> " +
+        "<button class='btn btn-danger btn-borrar' data-id='" + fila.id + "'>" +
+        "<i class='bi bi-trash'></i></button>" +
+        "</td>";
+
+    listado += "</tr>";
+}
+
+    listado += "</tbody></table>";
+    document.querySelector("#listados").innerHTML = listado;
+}
+
+async function procesarListadoCursos() {
+    // Obtener el listado de componentes
+    let respuesta = await oEmpresa.listadoCursos();
+
+    ocultarFormularios();
+    listados.classList.remove("d-none");
+
+    let listado = '<table class="table table-striped" id="tablaCursos">';
+    listado +=
+        "<thead><tr><th>ID</th><th>CATEGORIA</th><th>TITULO</th><th>DESCRIPCION</th><th>NIVEL</th><th>DURACION(h)</th><th>PRECIO</th><th>PUBLICADO</th><th>FECHA PUBLICACIO</th><th>ACCIONES</th></tr></thead>";
+    listado += "<tbody>";
+
+    for (let fila of respuesta.datos) {
+    listado += "<tr><td>" + fila.id + "</td>";
+    listado += "<td>" + fila.categorias + "</td>";
+    listado += "<td>" + fila.titulo + "</td>";
+    listado += "<td>" + fila.descripcion + "</td>";
+    listado += "<td>" + fila.nivel + "</td>";
+    listado += "<td>" + fila.duracion_horas + "</td>";
+    listado += "<td>" + fila.precio + "</td>";
+
+    if (parseInt(fila.publicado) === 1) {
+        listado += "<td class='table-success'>SI</td>";
+    } else {
+        listado += "<td class='table-danger'>NO</td>";
+    }
+
+    listado += "<td>" + (fila.fecha_publicacion ?? "") + "</td>";
+
+    listado +=
+        "<td>" +
+        "<button class='btn btn-primary btn-editar' data-curso='" + JSON.stringify(fila) + "'>" +
+        "<i class='bi bi-pencil-square'></i></button> " +
+        "<button class='btn btn-danger btn-borrar' data-id='" + fila.id + "'>" +
+        "<i class='bi bi-trash'></i></button>" +
+        "</td>";
+
+    listado += "</tr>";
+}
+
+    listado += "</tbody></table>";
+    document.querySelector("#listados").innerHTML = listado;
+}
+
