@@ -1,6 +1,6 @@
 "use strict";
 
-const rutaBackend = "http://localhost:8080/js/Proyecto_js_e-learning/php/";
+const rutaBackend = "http://localhost/ProyectoJavascript/Proyecto_js_e-learning/php/";
 
 /**
  * Realiza peticiones AJAX de tipo GET
