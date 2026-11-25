@@ -418,6 +418,106 @@
 
 
 
+        <div class="row">
+            <form class="form-horizontal d-none" name="frmAltaLeccion" id="frmAltaLeccion">
+                <fieldset>
+                    <legend>Alta de leccion</legend>
+                    <input type="hidden" name="txtIdLeccion" id="txtIdLeccion">
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="lstModulosLeccion">Modulo</label>
+                        <div class="col-xs-4">
+                            <select class="form-select" name="lstModulosLeccion" id="lstModulosLeccion" required></select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="txtTituloLeccion">Titulo</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="text" name="txtTituloLeccion" id="txtTituloLeccion"
+                                maxlength="150" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="lstTipoRecurso">Tipo de recurso</label>
+                        <div class="col-xs-4">
+                            <select class="form-select" name="lstTipoRecurso" id="lstTipoRecurso" required>
+                                <option value="video">Video</option>
+                                <option value="pdf">PDF</option>
+                                <option value="audio">Audio</option>
+                                <option value="imagen">Imagen</option>
+                                <option value="texto">Texto</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="txtRecursoUrl">URL del recurso</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="url" name="txtRecursoUrl" id="txtRecursoUrl" maxlength="255">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="intDuracionLeccion">Duracion (minutos)</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="number" name="intDuracionLeccion" id="intDuracionLeccion"
+                                min="0" step="1" value="0" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="intOrdenLeccion">Orden en el modulo</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="number" name="intOrdenLeccion" id="intOrdenLeccion"
+                                min="1" step="1" required>
+                        </div>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="gratuitaLeccion" value="1"
+                            id="gratuitaLeccion">
+                        <label class="form-check-label" for="gratuitaLeccion">Gratuita</label>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="fechaPublicacionLeccion">Fecha de publicacion</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="date" name="fechaPublicacionLeccion"
+                                id="fechaPublicacionLeccion" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-xs-4">
+                            <input type="button" id="btnAceptarAltaLeccion" class="btn btn-primary" value="Aceptar">
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <div class="row">
+            <form class="form-horizontal d-none" name="frmBuscarLeccion" id="frmBuscarLeccion">
+                <fieldset>
+                    <legend>Buscar una leccion</legend>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="txtBuscarTituloLeccion">Titulo</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="text" name="txtBuscarTituloLeccion"
+                                id="txtBuscarTituloLeccion" maxlength="150">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-xs-4">
+                            <input type="button" id="btnBuscarLeccion" class="btn btn-primary" value="Buscar">
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
         <div id="listados"></div>
         <div id="listadosModulo" class="d-none"></div>
 

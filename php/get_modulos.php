@@ -17,7 +17,6 @@ try {
     while ($fila = $resultado->fetch_assoc()) {
         $datos[] = $fila;
     }
-
     responder($datos, true, "Módulos recuperados correctamente", $conexion);
 } catch (mysqli_sql_exception $e) {
     responder(null, false, "Error en la base de datos: " . $e->getMessage(), $conexion ?? null);
