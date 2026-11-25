@@ -262,6 +262,34 @@ class Curso {
 
 
 
+class Leccion {
+    constructor(id, modulo_id, titulo, tipo_recurso, recurso_url, duracion_min, orden, gratuita, fecha_publicacion) {
+        this.id = id;
+        this.modulo_id = modulo_id;
+        this.titulo = titulo;
+        this.tipo_recurso = tipo_recurso;
+        this.recurso_url = recurso_url;
+        this.duracion_min = duracion_min;
+        this.orden = orden;
+        this.gratuita = gratuita;
+        this.fecha_publicacion = fecha_publicacion;
+    }
+
+    toJSON() {
+        return {
+            id: this.id,
+            modulo_id: this.modulo_id,
+            titulo: this.titulo,
+            tipo_recurso: this.tipo_recurso,
+            recurso_url: this.recurso_url,
+            duracion_min: this.duracion_min,
+            orden: this.orden,
+            gratuita: this.gratuita,
+            fecha_publicacion: this.fecha_publicacion
+        };
+    }
+}
+
 class Empresa {
 
     async listadoCategoria() {
@@ -351,37 +379,7 @@ class Empresa {
 
         await actualizarDesplegableDificultad(categoria.dificultad_id);
     }
-}
 
-class Leccion {
-    constructor(id, modulo_id, titulo, tipo_recurso, recurso_url, duracion_min, orden, gratuita, fecha_publicacion) {
-        this.id = id;
-        this.modulo_id = modulo_id;
-        this.titulo = titulo;
-        this.tipo_recurso = tipo_recurso;
-        this.recurso_url = recurso_url;
-        this.duracion_min = duracion_min;
-        this.orden = orden;
-        this.gratuita = gratuita;
-        this.fecha_publicacion = fecha_publicacion;
-    }
-
-    toJSON() {
-        return {
-            id: this.id,
-            modulo_id: this.modulo_id,
-            titulo: this.titulo,
-            tipo_recurso: this.tipo_recurso,
-            recurso_url: this.recurso_url,
-            duracion_min: this.duracion_min,
-            orden: this.orden,
-            gratuita: this.gratuita,
-            fecha_publicacion: this.fecha_publicacion
-        };
-    }
-}
-
-class EmpresaLecciones extends Empresa {
     async listadoLecciones() {
         return await peticionGET("get_lecciones.php");
     }

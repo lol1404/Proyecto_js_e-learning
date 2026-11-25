@@ -2,7 +2,7 @@
 
 
 
-var oEmpresa = new EmpresaLecciones();
+var oEmpresa = new Empresa();
 
 registrarEventos();
 
@@ -89,6 +89,23 @@ function registrarEventos() {
     document
         .querySelector("#listados")
         .addEventListener("click", procesarAccionTablaCursos);
+
+    document.querySelector("#mnuAltaLeccion")
+        .addEventListener("click", () => mostrarFormularioLeccion("alta"));
+    document.querySelector("#mnuBuscarLeccion")
+        .addEventListener("click", () => mostrarFormularioLeccion("buscar"));
+    document.querySelector("#mnuListadoLecciones")
+        .addEventListener("click", procesarListadoLecciones);
+    document.querySelector("#mnuListadoLeccionesDuracion")
+        .addEventListener("click", mostrarFormularioLeccionesPorDuracion);
+    document.querySelector("#btnAceptarAltaLeccion")
+        .addEventListener("click", procesarAltaLeccion);
+    document.querySelector("#btnBuscarLeccion")
+        .addEventListener("click", procesarBuscarLeccion);
+    document.querySelector("#listados")
+        .addEventListener("submit", procesarFiltroDuracionLecciones);
+    document.querySelector("#listados")
+        .addEventListener("click", procesarAccionTablaLecciones);
 
 }
 
@@ -388,7 +405,7 @@ async function procesarAccionTabla(oEvento) {
 }
 
 async function actualizarDesplegableCursos() {
-    const respuesta = await oLecciones.getCursos();
+    const respuesta = await oEmpresa.getCursos();
     if (!respuesta.ok) {
         alert(respuesta.mensaje);
         return;
@@ -451,8 +468,8 @@ async function procesarAltaModulo() {
         fecha
     );
     const respuesta = id
-        ? await oLecciones.actualizarModulo(modulo)
-        : await oLecciones.altaModulo(modulo);
+        ? await oEmpresa.actualizarModulo(modulo)
+        : await oEmpresa.altaModulo(modulo);
     alert(respuesta.mensaje);
     if (respuesta.ok) {
         await procesarListadoModulos();
@@ -460,7 +477,7 @@ async function procesarAltaModulo() {
 }
 
 async function procesarListadoModulos() {
-    const respuesta = await oLecciones.listadoModulos();
+    const respuesta = await oEmpresa.listadoModulos();
     if (!respuesta.ok) {
         alert(respuesta.mensaje);
         return;
@@ -470,7 +487,7 @@ async function procesarListadoModulos() {
 
 async function procesarBuscarModulo() {
     const titulo = frmBuscarModulo.txtTituloBusqueda.value.trim();
-    const respuesta = await oLecciones.buscarModulo(titulo);
+    const respuesta = await oEmpresa.buscarModulo(titulo);
     if (!respuesta.ok) {
         alert(respuesta.mensaje);
         return;
@@ -485,7 +502,7 @@ async function procesarBuscarModuloPorFecha() {
         return;
     }
 
-    const respuesta = await oLecciones.buscarModuloPorFecha(
+    const respuesta = await oEmpresa.buscarModuloPorFecha(
         fecha,
         frmBuscarModuloFecha.condicionModulo.value
     );
@@ -555,9 +572,9 @@ async function procesarAccionTablaModulo(evento) {
     const botonBorrar = evento.target.closest(".btn-borrar-modulo");
 
     if (botonEditar) {
-        await oLecciones.editarModulo(botonEditar);
+        await oEmpresa.editarModulo(botonEditar);
     } else if (botonBorrar && confirm("¿Seguro que quieres borrar este módulo? También se borrarán sus lecciones.")) {
-        const respuesta = await oLecciones.borrarModulo(botonBorrar.dataset.id);
+        const respuesta = await oEmpresa.borrarModulo(botonBorrar.dataset.id);
         alert(respuesta.mensaje);
         if (respuesta.ok) {
             botonBorrar.closest("tr").remove();
@@ -628,45 +645,6 @@ async function procesarAltaCurso() {
     }
 }
 
-var oLecciones = new EmpresaLecciones();
-
-registrarEventosLecciones();
-
-function registrarEventosLecciones() {
-    document.querySelector('a[href="alta_leccion.php"]')
-        .addEventListener("click", (evento) => {
-            evento.preventDefault();
-            mostrarFormularioLeccion("alta");
-        });
-
-    document.querySelector('a[href="buscar_leccion.php"]')
-        .addEventListener("click", (evento) => {
-            evento.preventDefault();
-            mostrarFormularioLeccion("buscar");
-        });
-
-    document.querySelector('a[href="listado_lecciones.php"]')
-        .addEventListener("click", (evento) => {
-            evento.preventDefault();
-            procesarListadoLecciones();
-        });
-
-    document.querySelector('a[href="listado_lecciones_por_duracion.php"]')
-        .addEventListener("click", (evento) => {
-            evento.preventDefault();
-            mostrarFormularioLeccionesPorDuracion();
-        });
-
-    document.querySelector("#btnAceptarAltaLeccion")
-        .addEventListener("click", procesarAltaLeccion);
-    document.querySelector("#btnBuscarLeccion")
-        .addEventListener("click", procesarBuscarLeccion);
-    document.querySelector("#listados")
-        .addEventListener("submit", procesarFiltroDuracionLecciones);
-    document.querySelector("#listados")
-        .addEventListener("click", procesarAccionTablaLecciones);
-}
-
 function mostrarFormularioLeccion(tipo) {
     ocultarFormularios();
 
@@ -685,7 +663,7 @@ function mostrarFormularioLeccion(tipo) {
 }
 
 async function actualizarDesplegableModulos(idModulo) {
-    const respuesta = await oLecciones.listadoModulos();
+    const respuesta = await oEmpresa.listadoModulos();
     if (!respuesta.ok || !Array.isArray(respuesta.datos)) {
         alert(respuesta.mensaje || "No se pudieron cargar los modulos.");
         return;
@@ -720,8 +698,8 @@ async function procesarAltaLeccion() {
     );
 
     const respuesta = id
-        ? await oLecciones.actualizarLeccion(leccion)
-        : await oLecciones.altaLeccion(leccion);
+        ? await oEmpresa.actualizarLeccion(leccion)
+        : await oEmpresa.altaLeccion(leccion);
     alert(respuesta.mensaje);
 
     if (respuesta.ok) {
@@ -770,7 +748,7 @@ function validarAltaLeccion() {
 
 async function procesarBuscarLeccion() {
     const titulo = frmBuscarLeccion.txtBuscarTituloLeccion.value.trim();
-    const respuesta = await oLecciones.buscarLeccion(titulo);
+    const respuesta = await oEmpresa.buscarLeccion(titulo);
     mostrarListadoLecciones(respuesta, "Resultados de busqueda");
 }
 
@@ -795,12 +773,12 @@ async function procesarFiltroDuracionLecciones(evento) {
     evento.preventDefault();
 
     const duracion = evento.target.elements.duracion_min.value;
-    const respuesta = await oLecciones.listadoLeccionesPorDuracion(duracion);
+    const respuesta = await oEmpresa.listadoLeccionesPorDuracion(duracion);
     mostrarListadoLecciones(respuesta, "Lecciones con duración de " + duracion + " minutos");
 }
 
 async function procesarListadoLecciones() {
-    const respuesta = await oLecciones.listadoLecciones();
+    const respuesta = await oEmpresa.listadoLecciones();
     mostrarListadoLecciones(respuesta, "Listado de lecciones");
 }
 
@@ -860,7 +838,7 @@ async function procesarAccionTablaLecciones(evento) {
         frmAltaLeccion.fechaPublicacionLeccion.value = leccion.fecha_publicacion;
         await actualizarDesplegableModulos(leccion.modulo_id);
     } else if (botonBorrar && confirm("Seguro que quieres borrar esta leccion?")) {
-        const respuesta = await oLecciones.borrarLeccion(botonBorrar.dataset.id);
+        const respuesta = await oEmpresa.borrarLeccion(botonBorrar.dataset.id);
         alert(respuesta.mensaje);
         if (respuesta.ok) {
             botonBorrar.closest("tr").remove();
