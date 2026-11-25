@@ -90,6 +90,128 @@ class Categoria {
 }
 
 
+
+
+
+
+
+
+
+
+class Curso {
+    #id
+    #categoria_id
+    #titulo
+    #descripcion
+    #nivel
+    #duracion_horas
+    #precio
+    #publicado
+    #fecha_publicacion
+
+    constructor(id,
+        categoria_id,
+        titulo,
+        descripcion,
+        nivel,
+        duracion_horas,
+        precio,
+        publicado,
+        fecha_publicacion) {
+        this.#id = id
+        this.#categoria_id = categoria_id
+        this.#titulo = titulo
+        this.#descripcion = descripcion
+        this.#nivel = nivel
+        this.#duracion_horas = duracion_horas
+        this.#precio = precio
+        this.#publicado = publicado
+        this.#fecha_publicacion = fecha_publicacion
+    }
+
+    get id() {
+        return this.#id;
+    }
+    set id(id) {
+        this.#id = id;
+    }
+
+    get categoria_id() {
+        return this.#categoria_id;
+    }
+    set categoria_id(categoria_id) {
+        this.#categoria_id = categoria_id;
+    }
+
+    get titulo() {
+        return this.#titulo;
+    }
+    set titulo(titulo) {
+        this.#titulo = titulo;
+    }
+
+    get descripcion() {
+        return this.#descripcion;
+    }
+    set descripcion(descripcion) {
+        this.#descripcion = descripcion;
+    }
+
+    get nivel() {
+        return this.#nivel;
+    }
+    set nivel(nivel) {
+        this.#nivel = nivel;
+    }
+
+    get duracion_horas() {
+        return this.#duracion_horas;
+    }
+    set duracion_horas(duracion_horas) {
+        this.#duracion_horas = duracion_horas;
+    }
+
+    get precio() {
+        return this.#precio;
+    }
+    set precio(precio) {
+        this.#precio = precio;
+    }
+
+    get publicado() {
+        return this.#publicado;
+    }
+    set publicado(publicado) {
+        this.#publicado = publicado;
+    }
+
+    get fecha_publicacion() {
+        return this.#fecha_publicacion;
+    }
+    set fecha_publicacion(fecha_publicacion) {
+        this.#fecha_publicacion = fecha_publicacion;
+    }
+
+    toJSON() {
+        let oCurso = {
+            id: this.#id,
+            categoria_id: this.#categoria_id,
+            titulo: this.#titulo,
+            descripcion: this.#descripcion,
+            nivel: this.#nivel,
+            duracion_horas: this.#duracion_horas,
+            precio: this.#precio,
+            publicado: this.#publicado,
+            fecha_publicacion: this.#fecha_publicacion,
+        };
+        return oCurso;
+    }
+}
+
+
+
+
+
 class Empresa {
 
     async listadoCategoria() {
@@ -178,5 +300,12 @@ class Empresa {
         frmAltacategoria.activa.checked = parseInt(categoria.activa, 10) === 1;
 
         await actualizarDesplegableDificultad(categoria.dificultad_id);
+    }
+
+    async getCategoriasCursos() {
+
+        let respuesta = await peticionGET("get_categorias_cursos.php");
+
+        return respuesta;
     }
 }

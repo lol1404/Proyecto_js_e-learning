@@ -29,6 +29,25 @@ function registrarEventos() {
         .querySelector("#mnuListC")
         .addEventListener("click", procesarListadoCategorias);
 
+
+
+    // Cursos ---------------------
+    document
+        .querySelector("#mnuAltaCurso")
+        .addEventListener("click", mostrarFormulario);
+
+    document
+        .querySelector("#mnuBuscarCurso")
+        .addEventListener("click", mostrarFormulario);
+
+    document
+        .querySelector("#mnuListadoCursoCategoria")
+        .addEventListener("click", mostrarFormulario);
+
+    //document
+      //  .querySelector("#mnuListadoCurso")
+        //.addEventListener("click", procesarListadoCursos);
+
     // Botones --------------------
 
     document
@@ -43,6 +62,10 @@ function registrarEventos() {
     document
         .querySelector("#listados")
         .addEventListener("click", procesarAccionTabla);
+
+
+    // Botones cursos -------------------
+
 
 }
 
@@ -66,6 +89,17 @@ function mostrarFormulario(oEvento) {
         case "mnuListPFC":
             frmBuscarcategoriaPF.classList.remove("d-none");
             break;
+        case "mnuAltaCurso":
+            frmAltaCurso.classList.remove("d-none");
+            actualizarDesplegableCategoria(undefined);
+            break;
+        case "mnuBuscarCurso":
+            frmBuscarcurso.classList.remove("d-none");
+            break;
+        case "mnuListadoCursoCategoria":
+            frmBuscarcursocategoria.classList.remove("d-none");
+            actualizarDesplegableCategoria(undefined);
+            break;
     }
 }
 
@@ -77,6 +111,12 @@ function ocultarFormularios() {
     listados.classList.add("d-none");
 
     frmBuscarcategoriaPF.classList.add("d-none");
+
+    frmAltaCurso.classList.add("d-none");
+
+    frmBuscarcurso.classList.add("d-none");
+
+    frmBuscarcursocategoria.classList.add("d-none");
 }
 
 async function procesarListadoCategorias() {
@@ -295,4 +335,70 @@ async function procesarAccionTabla(oEvento) {
         }
     }
     // si no es ninguno de los dos, se ignora el clic
+}
+
+
+
+async function actualizarDesplegableCategoria(id_categoria) {
+    let respuesta = await oEmpresa.getCategoriasCursos();
+    let options = "";
+
+    for (let categoria of respuesta.datos) {
+        if (id_categoria && id_categoria == categoria.id) {
+            // Si llega el parámetro ( != undefined )
+            options +=
+                "<option selected value='" +
+                categoria.id +
+                "' >" +
+                categoria.nombre +
+                "</option>";
+        } else {
+            options +=
+                "<option value='" + categoria.id + "' >" + categoria.nombre + "</option>";
+        }
+    }
+    // Agrego los options generados a partir del contenido de la BD en todos los desplegables
+    frmAltaCurso.lstAltaCursoCategoria.innerHTML = options;
+    frmBuscarcursocategoria.lstCategoria.innerHTML = options;
+}
+
+
+
+
+
+async function procesarAltaCategoria() {
+    if (validarAltaCategoria()) {
+        let id = frmAltacategoria.txtIdCategoria.value;
+        let nombre = frmAltacategoria.txtNombre.value.trim();
+        let descripcion = frmAltacategoria.txtDescripcion.value.trim();
+        let orden = parseInt(frmAltacategoria.intorden.value);
+        let dificultad = parseInt(frmAltacategoria.lstDificultades.value);
+        let activa = frmAltacategoria.activa.checked
+        let fecha = new Date().toLocaleDateString("sv-SE");
+
+        let categoria = new Categoria(id || null,
+            nombre,
+            descripcion,
+            dificultad,
+            orden,
+            activa,
+            fecha);
+
+        let respuesta = id
+            ? await oEmpresa.actualizarCategoria(categoria)
+            : await oEmpresa.altaCategoria(categoria);
+
+        alert(respuesta.mensaje);
+
+        if (respuesta.ok) {
+            // Si NO hay error
+            //Resetear formulario
+            frmAltacategoria.reset();
+            frmAltacategoria.txtIdCategoria.value = "";
+            frmAltacategoria.querySelector("legend").textContent = "Alta de categoría";
+            frmAltacategoria.btnAceptarAltaCategoria.value = "Aceptar";
+            // Ocultar el formulario
+            frmAltacategoria.classList.add("d-none");
+        }
+    }
 }
