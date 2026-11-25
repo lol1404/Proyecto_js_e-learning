@@ -54,7 +54,7 @@ function registrarEventos() {
     frmAltacategoria.btnAceptarAltaCategoria.addEventListener("click", procesarAltaCategoria)
 
     document
-    frmBuscarcategoria.btnAceptarBuscarCategoria.addEventListener("click", () => procesarBuscarCategorias(false))
+    frmBuscarcurso.btnAceptarBuscarCurso.addEventListener("click", () => procesarBuscarCategorias(false))
 
     document
     frmBuscarcategoriaPF.btnBuscar.addEventListener("click", () => procesarBuscarCategorias(true))
@@ -65,7 +65,18 @@ function registrarEventos() {
 
 
     // Botones cursos -------------------
+    document
+    frmAltaCurso.btnAceptarAltaCurso.addEventListener("click", procesarAltaCurso)
 
+    document
+    frmBuscarcurso.btnAceptarBuscarCurso.addEventListener("click", () => procesarBuscarCurso(false))
+
+    document
+    frmBuscarcursocategoria.btnBuscar.addEventListener("click", () => procesarBuscarCurso(true))
+
+    document
+        .querySelector("#listados")
+        .addEventListener("click", procesarAccionTabla);
 
 }
 
@@ -90,6 +101,7 @@ function mostrarFormulario(oEvento) {
             frmBuscarcategoriaPF.classList.remove("d-none");
             break;
         case "mnuAltaCurso":
+            frmAltaCurso.reset();
             frmAltaCurso.classList.remove("d-none");
             actualizarDesplegableCategoria(undefined);
             break;
@@ -366,39 +378,81 @@ async function actualizarDesplegableCategoria(id_categoria) {
 
 
 
-async function procesarAltaCategoria() {
-    if (validarAltaCategoria()) {
-        let id = frmAltacategoria.txtIdCategoria.value;
-        let nombre = frmAltacategoria.txtNombre.value.trim();
-        let descripcion = frmAltacategoria.txtDescripcion.value.trim();
-        let orden = parseInt(frmAltacategoria.intorden.value);
-        let dificultad = parseInt(frmAltacategoria.lstDificultades.value);
-        let activa = frmAltacategoria.activa.checked
-        let fecha = new Date().toLocaleDateString("sv-SE");
+async function procesarAltaCurso() {
+    if (validarAltaCurso()) {
+        let categoria_id = frmAltaCurso.lstAltaCursoCategoria.value;
+        let titulo = frmAltaCurso.txtAltaCursoTitulo.value.trim();
+        let descripcion = frmAltaCurso.txtAltaCursoDescripcion.value.trim();
+        let nivel = frmAltaCurso.lstAltaCursoNivel.value;
+        let duracion_horas = frmAltaCurso.txtAltaCursoHoras.value;
+        let precio = frmAltaCurso.txtAltaCursoPrecio.value;
+        let publicado = frmAltaCurso.chkAltaCursoPublicado.checked;
+        let fecha_publicacion = frmAltaCurso.txtAltaCursoFecha.value;
 
-        let categoria = new Categoria(id || null,
-            nombre,
+
+        let curso = new Curso(null,
+            categoria_id,
+            titulo,
             descripcion,
-            dificultad,
-            orden,
-            activa,
-            fecha);
+            nivel,
+            duracion_horas,
+            precio,
+            publicado,
+            fecha_publicacion);
 
-        let respuesta = id
-            ? await oEmpresa.actualizarCategoria(categoria)
-            : await oEmpresa.altaCategoria(categoria);
+        let respuesta = await oEmpresa.altaCurso(curso);
 
         alert(respuesta.mensaje);
 
         if (respuesta.ok) {
             // Si NO hay error
             //Resetear formulario
-            frmAltacategoria.reset();
-            frmAltacategoria.txtIdCategoria.value = "";
-            frmAltacategoria.querySelector("legend").textContent = "Alta de categoría";
-            frmAltacategoria.btnAceptarAltaCategoria.value = "Aceptar";
+            frmAltaCurso.reset();
             // Ocultar el formulario
-            frmAltacategoria.classList.add("d-none");
+            frmAltaCurso.classList.add("d-none");
         }
     }
+}
+
+
+
+function validarAltaCurso() {
+    let titulo = frmAltaCurso.txtAltaCursoTitulo.value.trim();
+    let descripcion = frmAltaCurso.txtAltaCursoDescripcion.value.trim();
+    let duracion_horas = frmAltaCurso.txtAltaCursoHoras.value;
+    let precio = frmAltaCurso.txtAltaCursoPrecio.value;
+    let publicado = frmAltaCurso.chkAltaCursoPublicado.checked;
+    let fecha_publicacion = frmAltaCurso.txtAltaCursoFecha.value;
+    let errores = [];
+
+    if (!titulo) {
+        errores.push("El nombre es obligatorio.");
+    } else if (titulo.length > 150) {
+        errores.push("El nombre no puede superar los 150 caracteres.");
+    }
+
+    if (!descripcion) {
+        errores.push("La descripción es obligatoria.");
+    }
+
+    if (!Number.isSafeInteger(Number(duracion_horas)) || Number(duracion_horas) < 1) {
+        errores.push("La duración debe ser un número entero mayor que cero.");
+    }
+
+    if (precio === "" || precio < 0) {
+        errores.push("El precio debe ser un número válido mayor o igual que cero.");
+    }
+
+    if (publicado && !fecha_publicacion) {
+        errores.push("La fecha de publicación es obligatoria si el curso está publicado.");
+    } else if (!fecha_publicacion){
+        errores.push("La cadena de fecha no puede estar vacía")
+    }
+
+    if (errores.length > 0) {
+        alert(errores.join("\n"));
+        return false;
+    }
+
+    return true;
 }

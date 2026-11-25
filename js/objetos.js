@@ -308,4 +308,25 @@ class Empresa {
 
         return respuesta;
     }
+
+
+
+
+    async altaCurso(oCurso) {
+        let datos = new FormData();
+
+        datos.append("id", oCurso.id);
+        datos.append("categoria_id", oCurso.categoria_id);
+        datos.append("titulo", oCurso.titulo);
+        datos.append("descripcion", oCurso.descripcion);
+        datos.append("nivel", oCurso.nivel);
+        datos.append("duracion_horas", oCurso.duracion_horas);
+        datos.append("precio", oCurso.precio);
+        datos.append("publicado", oCurso.publicado);
+        datos.append("fecha_publicacion", oCurso.fecha_publicacion);
+
+        let respuesta = await peticionPOST("alta_curso.php", datos);
+
+        return respuesta;
+    }
 }
