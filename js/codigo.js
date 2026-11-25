@@ -44,6 +44,17 @@ function registrarEventos() {
         .querySelector("#listados")
         .addEventListener("click", procesarAccionTabla);
 
+    document.querySelector("#mnuAltaModulo").addEventListener("click", mostrarFormulario);
+    document.querySelector("#mnuBuscarModulo").addEventListener("click", mostrarFormulario);
+    document.querySelector("#mnuListModulo").addEventListener("click", async () => {
+        ocultarFormularios();
+        await procesarListadoModulos();
+    });
+    document.querySelector("#mnuListPFModulo").addEventListener("click", mostrarFormulario);
+    document.querySelector("#btnAceptarModulo").addEventListener("click", procesarAltaModulo);
+    document.querySelector("#btnBuscarModulo").addEventListener("click", procesarBuscarModulo);
+    document.querySelector("#btnBuscarModuloFecha").addEventListener("click", procesarBuscarModuloPorFecha);
+    document.querySelector("#listadosModulo").addEventListener("click", procesarAccionTablaModulo);
 }
 
 function mostrarFormulario(oEvento) {
@@ -66,6 +77,24 @@ function mostrarFormulario(oEvento) {
         case "mnuListPFC":
             frmBuscarcategoriaPF.classList.remove("d-none");
             break;
+        case "mnuAltaModulo":
+            frmAltaModulo.reset();
+            frmAltaModulo.txtIdModulo.value = "";
+            frmAltaModulo.querySelector("legend").textContent = "Alta de módulo";
+            frmAltaModulo.btnAceptarModulo.value = "Aceptar";
+            frmAltaModulo.fechaCreacionModulo.value = new Date().toLocaleDateString("sv-SE");
+            frmAltaModulo.obligatorio.checked = true;
+            actualizarDesplegableCursos();
+            frmAltaModulo.classList.remove("d-none");
+            break;
+        case "mnuBuscarModulo":
+            frmBuscarModulo.reset();
+            frmBuscarModulo.classList.remove("d-none");
+            break;
+        case "mnuListPFModulo":
+            frmBuscarModuloFecha.reset();
+            frmBuscarModuloFecha.classList.remove("d-none");
+            break;
     }
 }
 
@@ -77,6 +106,10 @@ function ocultarFormularios() {
     listados.classList.add("d-none");
 
     frmBuscarcategoriaPF.classList.add("d-none");
+    frmAltaModulo.classList.add("d-none");
+    frmBuscarModulo.classList.add("d-none");
+    frmBuscarModuloFecha.classList.add("d-none");
+    listadosModulo.classList.add("d-none");
 }
 
 async function procesarListadoCategorias() {
@@ -295,4 +328,182 @@ async function procesarAccionTabla(oEvento) {
         }
     }
     // si no es ninguno de los dos, se ignora el clic
+}
+
+async function actualizarDesplegableCursos() {
+    const respuesta = await oEmpresa.getCursos();
+    if (!respuesta.ok) {
+        alert(respuesta.mensaje);
+        return;
+    }
+    if (!respuesta.datos.length) {
+        alert("No hay cursos disponibles para asignar el módulo.");
+        return;
+    }
+
+    frmAltaModulo.lstCurso.innerHTML = "";
+    for (const curso of respuesta.datos) {
+        const opcion = document.createElement("option");
+        opcion.value = curso.id;
+        opcion.textContent = curso.titulo;
+        frmAltaModulo.lstCurso.append(opcion);
+    }
+}
+
+async function procesarAltaModulo() {
+    const id = frmAltaModulo.txtIdModulo.value.trim();
+    const titulo = frmAltaModulo.txtTituloModulo.value.trim();
+    const descripcion = frmAltaModulo.txtDescripcionModulo.value.trim();
+    const cursoId = Number(frmAltaModulo.lstCurso.value);
+    const orden = Number(frmAltaModulo.intOrdenModulo.value);
+    const fecha = frmAltaModulo.fechaCreacionModulo.value;
+    const errores = [];
+
+    if (!Number.isSafeInteger(cursoId) || cursoId < 1) {
+        errores.push("Selecciona un curso válido.");
+    }
+    if (!titulo) {
+        errores.push("El título es obligatorio.");
+    } else if (titulo.length > 150) {
+        errores.push("El título no puede superar los 150 caracteres.");
+    }
+    if (descripcion.length > 255) {
+        errores.push("La descripción no puede superar los 255 caracteres.");
+    }
+    if (!Number.isSafeInteger(orden) || orden < 1) {
+        errores.push("El orden debe ser un número entero mayor que cero.");
+    }
+    if (!fecha) {
+        errores.push("La fecha de creación es obligatoria.");
+    }
+    if (id && (!/^\d+$/.test(id) || !Number.isSafeInteger(Number(id)) || Number(id) < 1)) {
+        errores.push("El identificador del módulo no es válido.");
+    }
+    if (errores.length) {
+        alert(errores.join("\n"));
+        return;
+    }
+
+    const modulo = new Modulo(
+        id || null,
+        cursoId,
+        titulo,
+        descripcion,
+        orden,
+        frmAltaModulo.obligatorio.checked,
+        fecha
+    );
+    const respuesta = id
+        ? await oEmpresa.actualizarModulo(modulo)
+        : await oEmpresa.altaModulo(modulo);
+    alert(respuesta.mensaje);
+    if (respuesta.ok) {
+        await procesarListadoModulos();
+    }
+}
+
+async function procesarListadoModulos() {
+    const respuesta = await oEmpresa.listadoModulos();
+    if (!respuesta.ok) {
+        alert(respuesta.mensaje);
+        return;
+    }
+    mostrarListadoModulos(respuesta.datos);
+}
+
+async function procesarBuscarModulo() {
+    const titulo = frmBuscarModulo.txtTituloBusqueda.value.trim();
+    const respuesta = await oEmpresa.buscarModulo(titulo);
+    if (!respuesta.ok) {
+        alert(respuesta.mensaje);
+        return;
+    }
+    mostrarListadoModulos(respuesta.datos);
+}
+
+async function procesarBuscarModuloPorFecha() {
+    const fecha = frmBuscarModuloFecha.fechaModulo.value;
+    if (!fecha) {
+        alert("Selecciona una fecha para realizar la búsqueda.");
+        return;
+    }
+
+    const respuesta = await oEmpresa.buscarModuloPorFecha(
+        fecha,
+        frmBuscarModuloFecha.condicionModulo.value
+    );
+    if (!respuesta.ok) {
+        alert(respuesta.mensaje);
+        return;
+    }
+    mostrarListadoModulos(respuesta.datos);
+}
+
+function mostrarListadoModulos(datos) {
+    listadosModulo.classList.remove("d-none");
+    listadosModulo.replaceChildren();
+
+    const tabla = document.createElement("table");
+    tabla.className = "table table-striped";
+    const cabecera = tabla.createTHead().insertRow();
+    for (const titulo of ["ID", "CURSO", "TÍTULO", "DESCRIPCIÓN", "ORDEN", "OBLIGATORIO", "ACCIÓN"]) {
+        const th = document.createElement("th");
+        th.scope = "col";
+        th.textContent = titulo;
+        cabecera.append(th);
+    }
+    const cuerpo = tabla.createTBody();
+
+    if (!datos.length) {
+        const fila = cuerpo.insertRow();
+        const celda = fila.insertCell();
+        celda.colSpan = 7;
+        celda.textContent = "No se encontraron módulos.";
+    }
+
+    for (const modulo of datos) {
+        const fila = cuerpo.insertRow();
+        for (const valor of [
+            modulo.id,
+            modulo.curso,
+            modulo.titulo,
+            modulo.descripcion,
+            modulo.orden,
+            Number(modulo.obligatorio) === 1 ? "Sí" : "No",
+        ]) {
+            fila.insertCell().textContent = valor ?? "";
+        }
+
+        const acciones = fila.insertCell();
+        const botonEditar = document.createElement("button");
+        botonEditar.type = "button";
+        botonEditar.className = "btn btn-primary btn-editar-modulo me-2";
+        botonEditar.textContent = "Editar";
+        botonEditar.dataset.modulo = JSON.stringify(modulo);
+        acciones.append(botonEditar);
+
+        const botonBorrar = document.createElement("button");
+        botonBorrar.type = "button";
+        botonBorrar.className = "btn btn-danger btn-borrar-modulo";
+        botonBorrar.textContent = "Borrar";
+        botonBorrar.dataset.id = modulo.id;
+        acciones.append(botonBorrar);
+    }
+
+    listadosModulo.append(tabla);
+}
+
+async function procesarAccionTablaModulo(evento) {
+    const botonEditar = evento.target.closest(".btn-editar-modulo");
+    const botonBorrar = evento.target.closest(".btn-borrar-modulo");
+
+    if (botonEditar) {
+        await oEmpresa.editarModulo(botonEditar);
+    } else if (botonBorrar && confirm("¿Seguro que quieres borrar este módulo? También se borrarán sus lecciones.")) {
+        const respuesta = await oEmpresa.borrarModulo(botonBorrar.dataset.id);
+        alert(respuesta.mensaje);
+        if (respuesta.ok) {
+            botonBorrar.closest("tr").remove();
+        }
+    }
 }

@@ -85,13 +85,13 @@
                             Módulos
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="alta_modulo.php">Alta de Modulo</a></li>
+                            <li><a class="dropdown-item" href="#" id="mnuAltaModulo">Alta de Modulo</a></li>
                             <li>
                                 <hr class="dropdown-divider">
                             </li>
-                            <li><a class="dropdown-item" href="buscar_modulo.php">Buscar un modulo</a></li>
-                            <li><a class="dropdown-item" href="listado_modulos.php">Listado de modulos</a></li>
-                            <li><a class="dropdown-item" href="listado_modulos_por_fecha.php">Listado de modulos por
+                            <li><a class="dropdown-item" href="#" id="mnuBuscarModulo">Buscar un modulo</a></li>
+                            <li><a class="dropdown-item" href="#" id="mnuListModulo">Listado de modulos</a></li>
+                            <li><a class="dropdown-item" href="#" id="mnuListPFModulo">Listado de modulos por
                                     fecha</a></li>
                             <li>
                                 <hr class="dropdown-divider">
@@ -317,12 +317,109 @@
 
 
 
+        <div class="row">
+            <form class="form-horizontal d-none" name="frmAltaModulo" id="frmAltaModulo">
+                <fieldset>
+                    <legend>Alta de módulo</legend>
+                    <input type="hidden" id="txtIdModulo" name="txtIdModulo">
+
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="lstCurso">Curso</label>
+                        <div class="col-xs-4">
+                            <select class="form-select" id="lstCurso" name="lstCurso" required></select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="txtTituloModulo">Título</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" id="txtTituloModulo" name="txtTituloModulo"
+                                maxlength="150" type="text" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="txtDescripcionModulo">Descripción</label>
+                        <div class="col-xs-4">
+                            <textarea class="form-control" id="txtDescripcionModulo" name="txtDescripcionModulo"
+                                maxlength="255" rows="3"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="intOrdenModulo">Orden dentro del curso</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="number" id="intOrdenModulo" name="intOrdenModulo"
+                                min="1" step="1" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="fechaCreacionModulo">Fecha de creación</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="date" id="fechaCreacionModulo"
+                                name="fechaCreacionModulo" required>
+                        </div>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="obligatorio" name="obligatorio" checked>
+                        <label class="form-check-label" for="obligatorio">Obligatorio</label>
+                    </div>
+                    <div class="form-group mt-3">
+                        <input class="btn btn-primary" type="button" id="btnAceptarModulo"
+                            name="btnAceptarModulo" value="Aceptar">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <div class="row">
+            <form class="form-horizontal d-none" id="frmBuscarModulo" name="frmBuscarModulo">
+                <fieldset>
+                    <legend>Buscar módulos por título</legend>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="txtTituloBusqueda">Título</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" id="txtTituloBusqueda" name="txtTituloBusqueda" type="text">
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <input class="btn btn-primary" type="button" id="btnBuscarModulo" value="Buscar">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <div class="row">
+            <form class="form-horizontal d-none" id="frmBuscarModuloFecha" name="frmBuscarModuloFecha">
+                <fieldset>
+                    <legend>Buscar módulos por fecha de creación</legend>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="condicionModulo">Buscar módulos creados</label>
+                        <div class="col-xs-4">
+                            <select class="form-control" id="condicionModulo" name="condicionModulo" required>
+                                <option value="antes">Antes de</option>
+                                <option value="despues">Después de</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-xs-4 control-label" for="fechaModulo">Fecha</label>
+                        <div class="col-xs-4">
+                            <input class="form-control" type="date" id="fechaModulo" name="fechaModulo" required>
+                        </div>
+                    </div>
+                    <div class="form-group mt-3">
+                        <input class="btn btn-primary" type="button" id="btnBuscarModuloFecha"
+                            value="Buscar módulos">
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
         <!-- nuevo form -->
 
 
 
 
         <div id="listados"></div>
+        <div id="listadosModulo" class="d-none"></div>
 
     </div>
     <script type="text/javascript" src="js/ajax.js"></script>

@@ -89,6 +89,59 @@ class Categoria {
 
 }
 
+class Modulo {
+    #id
+    #curso_id
+    #titulo
+    #descripcion
+    #orden
+    #obligatorio
+    #fecha_creacion
+
+    constructor(id, curso_id, titulo, descripcion, orden, obligatorio, fecha_creacion) {
+        this.#id = id;
+        this.#curso_id = curso_id;
+        this.#titulo = titulo;
+        this.#descripcion = descripcion;
+        this.#orden = orden;
+        this.#obligatorio = obligatorio;
+        this.#fecha_creacion = fecha_creacion;
+    }
+
+    get id() { return this.#id; }
+    set id(id) { this.#id = id; }
+
+    get curso_id() { return this.#curso_id; }
+    set curso_id(curso_id) { this.#curso_id = curso_id; }
+
+    get titulo() { return this.#titulo; }
+    set titulo(titulo) { this.#titulo = titulo; }
+
+    get descripcion() { return this.#descripcion; }
+    set descripcion(descripcion) { this.#descripcion = descripcion; }
+
+    get orden() { return this.#orden; }
+    set orden(orden) { this.#orden = orden; }
+
+    get obligatorio() { return this.#obligatorio; }
+    set obligatorio(obligatorio) { this.#obligatorio = obligatorio; }
+
+    get fecha_creacion() { return this.#fecha_creacion; }
+    set fecha_creacion(fecha_creacion) { this.#fecha_creacion = fecha_creacion; }
+
+    toJSON() {
+        return {
+            id: this.#id,
+            curso_id: this.#curso_id,
+            titulo: this.#titulo,
+            descripcion: this.#descripcion,
+            orden: this.#orden,
+            obligatorio: this.#obligatorio,
+            fecha_creacion: this.#fecha_creacion,
+        };
+    }
+}
+
 
 class Curso {
     #id
@@ -289,5 +342,85 @@ class Empresa {
         frmAltacategoria.activa.checked = parseInt(categoria.activa, 10) === 1;
 
         await actualizarDesplegableDificultad(categoria.dificultad_id);
+    }
+
+    async listadoModulos() {
+        return await peticionGET("get_modulos.php");
+    }
+
+    async getCursos() {
+        return await peticionGET("get_cursos.php");
+    }
+
+    async altaModulo(modulo) {
+        const datos = new FormData();
+        datos.append("curso_id", modulo.curso_id);
+        datos.append("titulo", modulo.titulo);
+        datos.append("descripcion", modulo.descripcion);
+        datos.append("orden", modulo.orden);
+        datos.append("obligatorio", modulo.obligatorio ? 1 : 0);
+        datos.append("fecha_creacion", modulo.fecha_creacion);
+        return await peticionPOST("alta_modulo.php", datos);
+    }
+
+    async actualizarModulo(modulo) {
+        const datos = new FormData();
+        datos.append("id", modulo.id);
+        datos.append("curso_id", modulo.curso_id);
+        datos.append("titulo", modulo.titulo);
+        datos.append("descripcion", modulo.descripcion);
+        datos.append("orden", modulo.orden);
+        datos.append("obligatorio", modulo.obligatorio ? 1 : 0);
+        datos.append("fecha_creacion", modulo.fecha_creacion);
+        return await peticionPOST("editar_modulo.php", datos);
+    }
+
+    async borrarModulo(id) {
+        const datos = new FormData();
+        datos.append("id", id);
+        return await peticionPOST("borrar_modulo.php", datos);
+    }
+
+    async buscarModulo(titulo) {
+        const datos = new FormData();
+        datos.append("titulo", titulo);
+        return await peticionGET("get_buscar_modulos.php", datos);
+    }
+
+    async buscarModuloPorFecha(fecha, cuando) {
+        const datos = new FormData();
+        datos.append("fecha", fecha);
+        datos.append("cuando", cuando);
+        return await peticionGET("get_buscar_modulos.php", datos);
+    }
+
+    async editarModulo(boton) {
+        const modulo = JSON.parse(boton.dataset.modulo);
+        const respuesta = await this.getCursos();
+        if (!respuesta.ok) {
+            alert(respuesta.mensaje);
+            return;
+        }
+
+        frmAltaModulo.lstCurso.innerHTML = "";
+        for (const curso of respuesta.datos) {
+            const opcion = document.createElement("option");
+            opcion.value = curso.id;
+            opcion.textContent = curso.titulo;
+            frmAltaModulo.lstCurso.append(opcion);
+        }
+
+        ocultarFormularios();
+        listadosModulo.classList.remove("d-none");
+        frmAltaModulo.classList.remove("d-none");
+        frmAltaModulo.querySelector("legend").textContent = "Editar módulo";
+        frmAltaModulo.btnAceptarModulo.value = "Guardar cambios";
+        frmAltaModulo.txtIdModulo.value = modulo.id;
+        frmAltaModulo.lstCurso.value = modulo.curso_id;
+        frmAltaModulo.txtTituloModulo.value = modulo.titulo;
+        frmAltaModulo.txtDescripcionModulo.value = modulo.descripcion ?? "";
+        frmAltaModulo.intOrdenModulo.value = modulo.orden;
+        frmAltaModulo.obligatorio.checked = Number(modulo.obligatorio) === 1;
+        frmAltaModulo.fechaCreacionModulo.value = modulo.fecha_creacion;
     }
 }
