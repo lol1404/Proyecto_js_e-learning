@@ -137,7 +137,7 @@
 
 
 
-
+    
 
 
 
@@ -317,8 +317,136 @@
 
 
 
-        <!-- nuevo form -->
+        <!-- Cursos -->
+         <!-- Alta de curso -->
 
+        <form class="form-horizontal d-none" name="frmAltaCurso" id="frmAltaCurso">
+            <fieldset>
+                <legend>Alta de curso</legend>
+
+                <div class="form-group mb-2">
+                    <label class="col-xs-4 control-label" for="txtAltaCursoTitulo">Título</label>
+                    <div class="col-xs-4">
+                        <input id="txtAltaCursoTitulo" name="txtTitulo" placeholder="Título del curso"
+                            class="form-control input-md" type="text">
+                    </div>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="col-xs-4 control-label" for="txtAltaCursoDescripcion">Descripción</label>
+                    <div class="col-xs-4">
+                        <textarea id="txtAltaCursoDescripcion" name="txtDescripcion" rows="3"
+                            placeholder="Descripción del curso" class="form-control input-md"></textarea>
+                    </div>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="col-xs-4 control-label" for="lstAltaCursoCategoria">Categoría</label>
+                    <div class="col-xs-4">
+                        <select class="form-select" name="lstCategoria" id="lstAltaCursoCategoria"></select>
+                    </div>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="col-xs-4 control-label" for="lstAltaCursoNivel">Nivel</label>
+                    <div class="col-xs-4">
+                        <select class="form-select" name="lstNivel" id="lstAltaCursoNivel"></select>
+                    </div>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="col-xs-4 control-label" for="txtAltaCursoHoras">Duración (horas)</label>
+                    <div class="col-xs-4">
+                        <input id="txtAltaCursoHoras" name="txtHoras" placeholder="Horas" min="1" step="1"
+                            class="form-control input-md" type="number">
+                    </div>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="col-xs-4 control-label" for="txtAltaCursoPrecio">Precio (€)</label>
+                    <div class="col-xs-4">
+                        <input id="txtAltaCursoPrecio" name="txtPrecio" placeholder="Precio" min="0" step="0.01"
+                            class="form-control input-md" type="number">
+                    </div>
+                </div>
+
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="chkPublicado" id="chkAltaCursoPublicado"
+                        value="1">
+                    <label class="form-check-label" for="chkAltaCursoPublicado">Publicado</label>
+                </div>
+
+                <div class="form-group mb-2">
+                    <label class="col-xs-4 control-label" for="txtAltaCursoFecha">Fecha de publicación</label>
+                    <div class="col-xs-4">
+                        <input id="txtAltaCursoFecha" name="txtFecha" class="form-control input-md" type="date">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-xs-4">
+                        <input type="button" id="btnAceptarAltaCurso" name="btnAceptarAltaCurso" class="btn btn-primary"
+                            value="Aceptar" />
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+
+        <!-- Buscar cursos por nombre -->
+
+        <form class="form-horizontal d-none" name="frmBuscarcurso" id="frmBuscarcurso">
+            <fieldset>
+                <!-- Form Name -->
+                <legend>Buscar un curso</legend>
+                <!-- Text input-->
+                <div class="form-group mb-3">
+                    <label class="col-xs-4 control-label" for="txtTituloCurso">Título</label>
+                    <div class="col-xs-4">
+                        <input id="txtTituloCurso" name="txtTituloCurso" placeholder="Título del curso (o parte)" class="form-control input-md" type="text" required>
+                    </div>
+                </div>
+
+                <!-- Button -->
+                <div class="form-group">
+                    <label class="col-xs-4 control-label" for="btnAceptarBuscarCurso"></label>
+                    <div class="col-xs-4">
+                        <input type="button" id="btnAceptarBuscarCurso" name="btnAceptarBuscarCurso" class="btn btn-primary" value="Aceptar" />
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+
+        <!-- Listado de cursos por categoría -->
+
+        <form class="form-horizontal d-none" name="frmBuscarcursocategoria" id="frmBuscarcursocategoria">
+
+            <fieldset>
+                <legend>Buscar cursos por categoría</legend>
+
+                <!-- Seleccionar categoría -->
+                <div class="form-group mb-3">
+                    <label class="col-xs-4 control-label" for="lstCategoria">
+                        Categoría:
+                    </label>
+
+                    <div class="col-xs-4">
+                        <select class="form-select" name="lstCategoria" id="lstCategoria" required>
+                            <option value="">— Selecciona una categoría —</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Botón buscar -->
+                <div class="form-group">
+                    <div class="col-xs-offset-4 col-xs-4">
+                        <input type="button" id="btnBuscar" name="btnBuscar" class="btn btn-primary" value="Buscar cursos" />
+                    </div>
+                </div>
+
+            </fieldset>
+        </form>
 
 
 
