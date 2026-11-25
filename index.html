@@ -151,13 +151,14 @@
                 <fieldset>
                     <!-- Form Name -->
                     <legend>Alta de categoría</legend>
+                    <input type="hidden" name="txtIdCategoria" id="txtIdCategoria">
 
                     <!-- NOMBRE -->
                     <div class="form-group">
                         <label class="col-xs-4 control-label" for="txtNombre">Nombre</label>
                         <div class="col-xs-4">
                             <input id="txtNombre" name="txtNombre" placeholder="Nombre de la categoría"
-                                class="form-control input-md" maxlength="25" type="text">
+                                class="form-control input-md" maxlength="25" type="text" required>
                         </div>
                     </div>
 
@@ -166,7 +167,7 @@
                         <label class="col-xs-4 control-label" for="txtDescripcion">Descripción</label>
                         <div class="col-xs-4">
                             <input id="txtDescripcion" name="txtDescripcion" placeholder="Descripción de la categoría"
-                                class="form-control input-md" type="text">
+                                class="form-control input-md" type="text" required>
                         </div>
                     </div>
 
@@ -175,7 +176,7 @@
                         <label class="col-xs-4 control-label" for="intorden">Orden</label>
                         <div class="col-xs-4">
                             <input id="intorden" name="intorden" placeholder="Orden" class="form-control input-md"
-                                type="number">
+                                type="number" min="1" step="1" required>
                         </div>
                     </div>
 
@@ -184,7 +185,7 @@
                         <label class="col-xs-4 control-label" for="lstDificultades">Dificultad</label>
                         <div class="col-xs-4">
                             <select name="lstDificultades" id="lstDificultades" class="form-select"
-                                aria-label="Default select example">
+                                aria-label="Default select example" required>
                                 
                             </select>
                         </div>

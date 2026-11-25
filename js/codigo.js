@@ -40,6 +40,10 @@ function registrarEventos() {
     document
     frmBuscarcategoriaPF.btnBuscar.addEventListener("click", () => procesarBuscarCategorias(true))
 
+    document
+        .querySelector("#listados")
+        .addEventListener("click", procesarAccionTabla);
+
 }
 
 function mostrarFormulario(oEvento) {
@@ -49,6 +53,10 @@ function mostrarFormulario(oEvento) {
 
     switch (opcionMenu) {
         case "mnuAltaC":
+            frmAltacategoria.reset();
+            frmAltacategoria.txtIdCategoria.value = "";
+            frmAltacategoria.querySelector("legend").textContent = "Alta de categoría";
+            frmAltacategoria.btnAceptarAltaCategoria.value = "Aceptar";
             frmAltacategoria.classList.remove("d-none");
             actualizarDesplegableDificultad(undefined)
             break;
@@ -90,9 +98,9 @@ async function procesarListadoCategorias() {
         listado += "<td>" + fila.orden + "</td>";
         listado += "<td>" + fila.fecha_creacion + "</td>";
         if (parseInt(fila.activa) === 1) {
-            listado += "<td class='table-success'>" + fila.activa + "</td>";
+            listado += "<td class='table-success'>SI</td>";
         } else {
-            listado += "<td class='table-danger'>" + fila.activa + "</td>";
+            listado += "<td class='table-danger'>NO</td>";
         }
 
         listado += "<td>" + fila.dificultad + "</td>";
@@ -117,6 +125,7 @@ async function procesarListadoCategorias() {
 
 async function procesarAltaCategoria() {
     if (validarAltaCategoria()) {
+        let id = frmAltacategoria.txtIdCategoria.value;
         let nombre = frmAltacategoria.txtNombre.value.trim();
         let descripcion = frmAltacategoria.txtDescripcion.value.trim();
         let orden = parseInt(frmAltacategoria.intorden.value);
@@ -124,13 +133,17 @@ async function procesarAltaCategoria() {
         let activa = frmAltacategoria.activa.checked
         let fecha = new Date().toLocaleDateString("sv-SE");
 
-        let respuesta = await oEmpresa.altaCategoria(new Categoria(null,
+        let categoria = new Categoria(id || null,
             nombre,
             descripcion,
             dificultad,
             orden,
             activa,
-            fecha));
+            fecha);
+
+        let respuesta = id
+            ? await oEmpresa.actualizarCategoria(categoria)
+            : await oEmpresa.altaCategoria(categoria);
 
         alert(respuesta.mensaje);
 
@@ -138,6 +151,9 @@ async function procesarAltaCategoria() {
             // Si NO hay error
             //Resetear formulario
             frmAltacategoria.reset();
+            frmAltacategoria.txtIdCategoria.value = "";
+            frmAltacategoria.querySelector("legend").textContent = "Alta de categoría";
+            frmAltacategoria.btnAceptarAltaCategoria.value = "Aceptar";
             // Ocultar el formulario
             frmAltacategoria.classList.add("d-none");
         }
@@ -147,20 +163,39 @@ async function procesarAltaCategoria() {
 function validarAltaCategoria() {
     let nombre = frmAltacategoria.txtNombre.value.trim();
     let descripcion = frmAltacategoria.txtDescripcion.value.trim();
-    let valido = true;
-    let errores = "";
+    let orden = Number(frmAltacategoria.intorden.value);
+    let dificultad = Number(frmAltacategoria.lstDificultades.value);
+    let id = frmAltacategoria.txtIdCategoria.value.trim();
+    let errores = [];
 
-    if (nombre.length == 0 || descripcion.length == 0) {
-        valido = false;
-        errores += "Faltan datos por rellenar";
+    if (!nombre) {
+        errores.push("El nombre es obligatorio.");
+    } else if (nombre.length > 25) {
+        errores.push("El nombre no puede superar los 25 caracteres.");
     }
 
-    if (!valido) {
-        // Hay errores
-        alert(errores);
+    if (!descripcion) {
+        errores.push("La descripción es obligatoria.");
     }
 
-    return valido;
+    if (!Number.isSafeInteger(orden) || orden < 1) {
+        errores.push("El orden debe ser un número entero mayor que cero.");
+    }
+
+    if (!Number.isSafeInteger(dificultad) || dificultad < 1) {
+        errores.push("Selecciona una dificultad válida.");
+    }
+
+    if (id && (!/^\\d+$/.test(id) || Number(id) < 1 || !Number.isSafeInteger(Number(id)))) {
+        errores.push("El identificador de la categoría no es válido.");
+    }
+
+    if (errores.length > 0) {
+        alert(errores.join("\n"));
+        return false;
+    }
+
+    return true;
 }
 
 async function actualizarDesplegableDificultad(idCategoria) {
@@ -217,9 +252,9 @@ async function procesarBuscarCategorias(fecha) {
         listado += "<td>" + fila.orden + "</td>";
         listado += "<td>" + fila.fecha_creacion + "</td>";
         if (parseInt(fila.activa) === 1) {
-            listado += "<td class='table-success'>" + fila.activa + "</td>";
+            listado += "<td class='table-success'>SI</td>";
         } else {
-            listado += "<td class='table-danger'>" + fila.activa + "</td>";
+            listado += "<td class='table-danger'>NO</td>";
         }
 
         listado += "<td>" + fila.dificultad + "</td>";
@@ -238,14 +273,6 @@ async function procesarBuscarCategorias(fecha) {
 
     listado += "</tbody></table>";
     document.querySelector("#listados").innerHTML = listado;
-
-    // ← AQUÍ, justo después
-    document
-        .querySelector("#tablaCategorias")
-        .addEventListener("click", procesarAccionTabla);
-
-    // Agregamos el contenido a la capa de listados
-    document.querySelector("#listados").innerHTML = listado;
 }
 
 async function procesarAccionTabla(oEvento) {
@@ -254,9 +281,18 @@ async function procesarAccionTabla(oEvento) {
     let botonBorrar = oEvento.target.closest(".btn-borrar");
 
     if (botonEditar) {
-        editarCategoria(botonEditar);
+        await oEmpresa.editarCategoria(botonEditar);
     } else if (botonBorrar) {
-        await borrarCategoria(botonBorrar);
+        let id = botonBorrar.dataset.id;
+
+        if (confirm("¿Seguro que quieres borrar esta categoría?")) {
+            let respuesta = await oEmpresa.borrarCategoria(id);
+            alert(respuesta.mensaje);
+
+            if (respuesta.ok) {
+                botonBorrar.closest("tr").remove();
+            }
+        }
     }
     // si no es ninguno de los dos, se ignora el clic
 }

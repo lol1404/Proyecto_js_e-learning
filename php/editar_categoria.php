@@ -15,10 +15,11 @@ try {
     $descripcion = isset($_POST['descripcion']) ? trim($_POST['descripcion']) : '';
     $dificultad_id = trim($_POST['dificultad_id']);
     $orden = trim($_POST['orden']);
+    $activa = isset($_POST['activa']) ? (int) $_POST['activa'] : 0;
 
-    // Prepared statement para insertar de forma segura
+    // Prepared statement para actualizar de forma segura
     $sql = "UPDATE categorias
- SET nombre = ?, descripcion = ?, dificultad_id = ?, orden = ?
+ SET nombre = ?, descripcion = ?, dificultad_id = ?, orden = ?, activa = ?
  WHERE id = ?";
     $stmt = $conexion->prepare($sql);
     if (!$stmt) {
@@ -26,13 +27,13 @@ try {
     }
 
     // Bind y ejecución ('s' -> string)
-    $stmt->bind_param('ssiii', $nombre, $descripcion, $dificultad_id, $orden, $id);
+    $stmt->bind_param('ssiiii', $nombre, $descripcion, $dificultad_id, $orden, $activa, $id);
     if (!$stmt->execute()) {
-        throw new mysqli_sql_exception('Error al ejecutar INSERT: ' . $stmt->error);
+        throw new mysqli_sql_exception('Error al ejecutar UPDATE: ' . $stmt->error);
     }
 
     // Éxito
-    responder(null, true, 'Se ha insertado la categoria', $conexion);
+    responder(null, true, 'Se ha actualizado la categoría', $conexion);
 } catch (mysqli_sql_exception $e) {
     // Responder con información controlada sobre el error de BBDD
     responder(null, false, 'Error en la base de datos: ' . $e->getMessage(), $conexion ?? null);

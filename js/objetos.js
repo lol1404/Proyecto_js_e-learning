@@ -114,6 +114,29 @@ class Empresa {
 
         return respuesta;
     }
+
+    async actualizarCategoria(oCategoria) {
+        let datos = new FormData();
+
+        datos.append("id", oCategoria.id);
+        datos.append("nombre", oCategoria.nombre);
+        datos.append("descripcion", oCategoria.descripcion);
+        datos.append("dificultad_id", oCategoria.dificultad_id);
+        datos.append("orden", oCategoria.orden);
+        datos.append("activa", oCategoria.activa ? 1 : 0);
+
+        let respuesta = await peticionPOST("editar_categoria.php", datos);
+
+        return respuesta;
+    }
+
+    async borrarCategoria(id) {
+        let datos = new FormData();
+        datos.append("id", id);
+
+        return await peticionPOST("borrar_categoria.php", datos);
+    }
+
     async getDificultad() {
         // let datos = new FormData();
 
@@ -141,14 +164,19 @@ class Empresa {
         return respuesta;
     }
 
-    editarCategoria(boton) {
-    let categoria = JSON.parse(boton.dataset.categoria);
+    async editarCategoria(boton) {
+        let categoria = JSON.parse(boton.dataset.categoria);
 
-    ocultarFormularios();
-    frmModificarcategoria.classList.remove("d-none");
+        ocultarFormularios();
+        frmAltacategoria.classList.remove("d-none");
+        frmAltacategoria.querySelector("legend").textContent = "Editar categoría";
+        frmAltacategoria.btnAceptarAltaCategoria.value = "Guardar cambios";
+        frmAltacategoria.txtIdCategoria.value = categoria.id;
+        frmAltacategoria.txtNombre.value = categoria.nombre;
+        frmAltacategoria.txtDescripcion.value = categoria.descripcion;
+        frmAltacategoria.intorden.value = categoria.orden;
+        frmAltacategoria.activa.checked = parseInt(categoria.activa, 10) === 1;
 
-    frmModificarcategoria.txtModId.value = categoria.id;
-    frmModificarcategoria.txtModNombre.value = categoria.nombre;
-    // ... resto de campos
-}
+        await actualizarDesplegableDificultad(categoria.dificultad_id);
+    }
 }
