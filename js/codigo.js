@@ -164,11 +164,8 @@ function mostrarFormulario(oEvento) {
 
 function ocultarFormularios() {
     frmAltacategoria.classList.add("d-none");
-
     frmBuscarcategoria.classList.add("d-none");
-
     listados.classList.add("d-none");
-
     frmBuscarcategoriaPF.classList.add("d-none");
     frmAltaModulo.classList.add("d-none");
     frmBuscarModulo.classList.add("d-none");
@@ -501,7 +498,6 @@ async function procesarBuscarModuloPorFecha() {
         alert("Selecciona una fecha para realizar la búsqueda.");
         return;
     }
-
     const respuesta = await oEmpresa.buscarModuloPorFecha(
         fecha,
         frmBuscarModuloFecha.condicionModulo.value

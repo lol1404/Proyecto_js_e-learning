@@ -253,15 +253,6 @@ class Curso {
     }
 }
 
-
-
-
-
-
-
-
-
-
 class Leccion {
     constructor(id, modulo_id, titulo, tipo_recurso, recurso_url, duracion_min, orden, gratuita, fecha_publicacion) {
         this.id = id;
@@ -475,7 +466,6 @@ class Empresa {
         frmAltaModulo.obligatorio.checked = Number(modulo.obligatorio) === 1;
         frmAltaModulo.fechaCreacionModulo.value = modulo.fecha_creacion;
     }
-
     async altaLeccion(leccion) {
         let datos = new FormData();
         datos.append("modulo_id", leccion.modulo_id);
