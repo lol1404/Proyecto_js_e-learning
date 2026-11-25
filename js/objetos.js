@@ -325,8 +325,10 @@ class EmpresaLecciones extends Empresa {
         return await peticionGET("get_lecciones.php");
     }
 
-    async listadoLeccionesPorDuracion() {
-        return await peticionGET("get_lecciones_por_duracion.php");
+    async listadoLeccionesPorDuracion(duracion) {
+        let datos = new FormData();
+        datos.append("duracion_min", duracion);
+        return await peticionGET("get_lecciones_por_duracion.php", datos);
     }
 
     async buscarLeccion(titulo) {

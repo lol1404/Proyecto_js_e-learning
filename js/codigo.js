@@ -320,19 +320,21 @@ function registrarEventosLecciones() {
     document.querySelector('a[href="listado_lecciones.php"]')
         .addEventListener("click", (evento) => {
             evento.preventDefault();
-            procesarListadoLecciones(false);
+            procesarListadoLecciones();
         });
 
     document.querySelector('a[href="listado_lecciones_por_duracion.php"]')
         .addEventListener("click", (evento) => {
             evento.preventDefault();
-            procesarListadoLecciones(true);
+            mostrarFormularioLeccionesPorDuracion();
         });
 
     document.querySelector("#btnAceptarAltaLeccion")
         .addEventListener("click", procesarAltaLeccion);
     document.querySelector("#btnBuscarLeccion")
         .addEventListener("click", procesarBuscarLeccion);
+    document.querySelector("#listados")
+        .addEventListener("submit", procesarFiltroDuracionLecciones);
     document.querySelector("#listados")
         .addEventListener("click", procesarAccionTablaLecciones);
 }
@@ -444,14 +446,34 @@ async function procesarBuscarLeccion() {
     mostrarListadoLecciones(respuesta, "Resultados de busqueda");
 }
 
-async function procesarListadoLecciones(ordenarPorDuracion) {
-    const respuesta = ordenarPorDuracion
-        ? await oLecciones.listadoLeccionesPorDuracion()
-        : await oLecciones.listadoLecciones();
-    mostrarListadoLecciones(
-        respuesta,
-        ordenarPorDuracion ? "Lecciones ordenadas por duracion" : "Listado de lecciones"
-    );
+function mostrarFormularioLeccionesPorDuracion() {
+    ocultarFormularios();
+    const listados = document.querySelector("#listados");
+    listados.innerHTML = '<form id="frmFiltroDuracionLecciones" class="mb-4">' +
+        '<fieldset><legend>Listado de lecciones por duración</legend>' +
+        '<div class="mb-3"><label class="form-label" for="duracionMinLecciones">' +
+        'Duración (minutos)</label>' +
+        '<input class="form-control" type="number" id="duracionMinLecciones" ' +
+        'name="duracion_min" min="0" step="1" required></div>' +
+        '<button type="submit" class="btn btn-primary">Buscar lecciones</button>' +
+        '</fieldset></form>';
+    listados.classList.remove("d-none");
+}
+
+async function procesarFiltroDuracionLecciones(evento) {
+    if (evento.target.id !== "frmFiltroDuracionLecciones") {
+        return;
+    }
+    evento.preventDefault();
+
+    const duracion = evento.target.elements.duracion_min.value;
+    const respuesta = await oLecciones.listadoLeccionesPorDuracion(duracion);
+    mostrarListadoLecciones(respuesta, "Lecciones con duración de " + duracion + " minutos");
+}
+
+async function procesarListadoLecciones() {
+    const respuesta = await oLecciones.listadoLecciones();
+    mostrarListadoLecciones(respuesta, "Listado de lecciones");
 }
 
 function mostrarListadoLecciones(respuesta, titulo) {
