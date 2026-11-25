@@ -77,6 +77,9 @@ function ocultarFormularios() {
     listados.classList.add("d-none");
 
     frmBuscarcategoriaPF.classList.add("d-none");
+
+    frmAltaLeccion.classList.add("d-none");
+    frmBuscarLeccion.classList.add("d-none");
 }
 
 async function procesarListadoCategorias() {
@@ -295,4 +298,231 @@ async function procesarAccionTabla(oEvento) {
         }
     }
     // si no es ninguno de los dos, se ignora el clic
+}
+
+var oLecciones = new EmpresaLecciones();
+
+registrarEventosLecciones();
+
+function registrarEventosLecciones() {
+    document.querySelector('a[href="alta_leccion.php"]')
+        .addEventListener("click", (evento) => {
+            evento.preventDefault();
+            mostrarFormularioLeccion("alta");
+        });
+
+    document.querySelector('a[href="buscar_leccion.php"]')
+        .addEventListener("click", (evento) => {
+            evento.preventDefault();
+            mostrarFormularioLeccion("buscar");
+        });
+
+    document.querySelector('a[href="listado_lecciones.php"]')
+        .addEventListener("click", (evento) => {
+            evento.preventDefault();
+            procesarListadoLecciones(false);
+        });
+
+    document.querySelector('a[href="listado_lecciones_por_duracion.php"]')
+        .addEventListener("click", (evento) => {
+            evento.preventDefault();
+            procesarListadoLecciones(true);
+        });
+
+    document.querySelector("#btnAceptarAltaLeccion")
+        .addEventListener("click", procesarAltaLeccion);
+    document.querySelector("#btnBuscarLeccion")
+        .addEventListener("click", procesarBuscarLeccion);
+    document.querySelector("#listados")
+        .addEventListener("click", procesarAccionTablaLecciones);
+}
+
+function mostrarFormularioLeccion(tipo) {
+    ocultarFormularios();
+
+    if (tipo === "alta") {
+        frmAltaLeccion.reset();
+        frmAltaLeccion.txtIdLeccion.value = "";
+        frmAltaLeccion.querySelector("legend").textContent = "Alta de leccion";
+        frmAltaLeccion.btnAceptarAltaLeccion.value = "Aceptar";
+        frmAltaLeccion.intDuracionLeccion.value = "0";
+        frmAltaLeccion.classList.remove("d-none");
+        actualizarDesplegableModulos();
+    } else {
+        frmBuscarLeccion.reset();
+        frmBuscarLeccion.classList.remove("d-none");
+    }
+}
+
+async function actualizarDesplegableModulos(idModulo) {
+    const respuesta = await oLecciones.listadoModulos();
+    if (!respuesta.ok || !Array.isArray(respuesta.datos)) {
+        alert(respuesta.mensaje || "No se pudieron cargar los modulos.");
+        return;
+    }
+
+    let options = '<option value="">Selecciona un modulo</option>';
+    for (const modulo of respuesta.datos) {
+        const seleccionado = Number(idModulo) === Number(modulo.id) ? " selected" : "";
+        options += "<option value=\"" + escaparHTML(modulo.id) + "\"" + seleccionado + ">" +
+            escaparHTML(modulo.titulo) + " - " + escaparHTML(modulo.curso) + "</option>";
+    }
+    frmAltaLeccion.lstModulosLeccion.innerHTML = options;
+}
+
+async function procesarAltaLeccion() {
+    const validacion = validarAltaLeccion();
+    if (!validacion) {
+        return;
+    }
+
+    const id = frmAltaLeccion.txtIdLeccion.value.trim();
+    const leccion = new Leccion(
+        id || null,
+        Number(frmAltaLeccion.lstModulosLeccion.value),
+        frmAltaLeccion.txtTituloLeccion.value.trim(),
+        frmAltaLeccion.lstTipoRecurso.value,
+        frmAltaLeccion.txtRecursoUrl.value.trim(),
+        Number(frmAltaLeccion.intDuracionLeccion.value),
+        Number(frmAltaLeccion.intOrdenLeccion.value),
+        frmAltaLeccion.gratuitaLeccion.checked,
+        frmAltaLeccion.fechaPublicacionLeccion.value
+    );
+
+    const respuesta = id
+        ? await oLecciones.actualizarLeccion(leccion)
+        : await oLecciones.altaLeccion(leccion);
+    alert(respuesta.mensaje);
+
+    if (respuesta.ok) {
+        frmAltaLeccion.reset();
+        frmAltaLeccion.txtIdLeccion.value = "";
+        frmAltaLeccion.classList.add("d-none");
+    }
+}
+
+function validarAltaLeccion() {
+    const modulo = Number(frmAltaLeccion.lstModulosLeccion.value);
+    const titulo = frmAltaLeccion.txtTituloLeccion.value.trim();
+    const duracionTexto = frmAltaLeccion.intDuracionLeccion.value.trim();
+    const duracion = Number(duracionTexto);
+    const orden = Number(frmAltaLeccion.intOrdenLeccion.value);
+    const fecha = frmAltaLeccion.fechaPublicacionLeccion.value;
+    const errores = [];
+
+    if (!Number.isSafeInteger(modulo) || modulo < 1) {
+        errores.push("Selecciona un modulo valido.");
+    }
+    if (!titulo || titulo.length > 150) {
+        errores.push("El titulo es obligatorio y no puede superar los 150 caracteres.");
+    }
+    if (!["video", "pdf", "audio", "imagen", "texto"].includes(frmAltaLeccion.lstTipoRecurso.value)) {
+        errores.push("Selecciona un tipo de recurso valido.");
+    }
+    if (frmAltaLeccion.txtRecursoUrl.value.trim().length > 255) {
+        errores.push("La URL no puede superar los 255 caracteres.");
+    }
+    if (!duracionTexto || !Number.isSafeInteger(duracion) || duracion < 0) {
+        errores.push("La duracion debe ser un numero entero igual o mayor que cero.");
+    }
+    if (!Number.isSafeInteger(orden) || orden < 1) {
+        errores.push("El orden debe ser un numero entero mayor que cero.");
+    }
+    if (!fecha) {
+        errores.push("La fecha de publicacion es obligatoria.");
+    }
+    if (errores.length) {
+        alert(errores.join("\n"));
+        return false;
+    }
+    return true;
+}
+
+async function procesarBuscarLeccion() {
+    const titulo = frmBuscarLeccion.txtBuscarTituloLeccion.value.trim();
+    const respuesta = await oLecciones.buscarLeccion(titulo);
+    mostrarListadoLecciones(respuesta, "Resultados de busqueda");
+}
+
+async function procesarListadoLecciones(ordenarPorDuracion) {
+    const respuesta = ordenarPorDuracion
+        ? await oLecciones.listadoLeccionesPorDuracion()
+        : await oLecciones.listadoLecciones();
+    mostrarListadoLecciones(
+        respuesta,
+        ordenarPorDuracion ? "Lecciones ordenadas por duracion" : "Listado de lecciones"
+    );
+}
+
+function mostrarListadoLecciones(respuesta, titulo) {
+    ocultarFormularios();
+    if (!respuesta.ok || !Array.isArray(respuesta.datos)) {
+        alert(respuesta.mensaje || "No se pudieron cargar las lecciones.");
+        return;
+    }
+
+    let listado = '<h2>' + escaparHTML(titulo) + '</h2>';
+    listado += '<table class="table table-striped" id="tablaLecciones">';
+    listado += "<thead><tr><th>ID</th><th>Modulo</th><th>Curso</th><th>Titulo</th>" +
+        "<th>Tipo</th><th>Recurso</th><th>Duracion (min)</th><th>Orden</th>" +
+        "<th>Gratuita</th><th>Fecha</th><th>Accion</th></tr></thead><tbody>";
+
+    for (const fila of respuesta.datos) {
+        const leccionJson = escaparHTML(JSON.stringify(fila));
+        listado += "<tr><td>" + escaparHTML(fila.id) + "</td>";
+        listado += "<td>" + escaparHTML(fila.modulo) + "</td>";
+        listado += "<td>" + escaparHTML(fila.curso) + "</td>";
+        listado += "<td>" + escaparHTML(fila.titulo) + "</td>";
+        listado += "<td>" + escaparHTML(fila.tipo_recurso) + "</td>";
+        listado += "<td>" + escaparHTML(fila.recurso_url || "") + "</td>";
+        listado += "<td>" + escaparHTML(fila.duracion_min) + "</td>";
+        listado += "<td>" + escaparHTML(fila.orden) + "</td>";
+        listado += "<td>" + (Number(fila.gratuita) === 1 ? "Si" : "No") + "</td>";
+        listado += "<td>" + escaparHTML(fila.fecha_publicacion) + "</td>";
+        listado += "<td><button class=\"btn btn-primary btn-editar-leccion\" data-leccion=\"" +
+            leccionJson + "\"><i class=\"bi bi-pencil-square\"></i></button> ";
+        listado += "<button class=\"btn btn-danger btn-borrar-leccion\" data-id=\"" +
+            escaparHTML(fila.id) + "\"><i class=\"bi bi-trash\"></i></button></td></tr>";
+    }
+
+    listado += "</tbody></table>";
+    document.querySelector("#listados").innerHTML = listado;
+    document.querySelector("#listados").classList.remove("d-none");
+}
+
+async function procesarAccionTablaLecciones(evento) {
+    const botonEditar = evento.target.closest(".btn-editar-leccion");
+    const botonBorrar = evento.target.closest(".btn-borrar-leccion");
+
+    if (botonEditar) {
+        const leccion = JSON.parse(botonEditar.dataset.leccion);
+        ocultarFormularios();
+        frmAltaLeccion.classList.remove("d-none");
+        frmAltaLeccion.querySelector("legend").textContent = "Editar leccion";
+        frmAltaLeccion.btnAceptarAltaLeccion.value = "Guardar cambios";
+        frmAltaLeccion.txtIdLeccion.value = leccion.id;
+        frmAltaLeccion.txtTituloLeccion.value = leccion.titulo;
+        frmAltaLeccion.lstTipoRecurso.value = leccion.tipo_recurso;
+        frmAltaLeccion.txtRecursoUrl.value = leccion.recurso_url || "";
+        frmAltaLeccion.intDuracionLeccion.value = leccion.duracion_min;
+        frmAltaLeccion.intOrdenLeccion.value = leccion.orden;
+        frmAltaLeccion.gratuitaLeccion.checked = Number(leccion.gratuita) === 1;
+        frmAltaLeccion.fechaPublicacionLeccion.value = leccion.fecha_publicacion;
+        await actualizarDesplegableModulos(leccion.modulo_id);
+    } else if (botonBorrar && confirm("Seguro que quieres borrar esta leccion?")) {
+        const respuesta = await oLecciones.borrarLeccion(botonBorrar.dataset.id);
+        alert(respuesta.mensaje);
+        if (respuesta.ok) {
+            botonBorrar.closest("tr").remove();
+        }
+    }
+}
+
+function escaparHTML(valor) {
+    return String(valor == null ? "" : valor)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
 }
