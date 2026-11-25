@@ -4,7 +4,7 @@
 
 - **Proyecto en GitHub:** https://github.com/lol1404/Proyecto_js_e-learning
 - **Alojamiento local:** http://localhost:8080/js/Proyecto_js_e-learning/
-- **Alojamiento público:** no hay una URL pública configurada actualmente.
+- **Alojamiento público:** https://trbajo-js.infinityfreeapp.com/
 - **phpMyAdmin local:** http://localhost:8081/
 
 ## Requisitos y puesta en marcha
