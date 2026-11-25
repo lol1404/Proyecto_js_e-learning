@@ -377,6 +377,7 @@ async function actualizarDesplegableCategoria(id_categoria) {
 
 async function procesarAltaCurso() {
     if (validarAltaCurso()) {
+        let id = frmAltaCurso.txtIdCurso.value;
         let categoria_id = frmAltaCurso.lstAltaCursoCategoria.value;
         let titulo = frmAltaCurso.txtAltaCursoTitulo.value.trim();
         let descripcion = frmAltaCurso.txtAltaCursoDescripcion.value.trim();
@@ -387,7 +388,7 @@ async function procesarAltaCurso() {
         let fecha_publicacion = frmAltaCurso.txtAltaCursoFecha.value;
 
 
-        let curso = new Curso(null,
+        let curso = new Curso(id || null,
             categoria_id,
             titulo,
             descripcion,
@@ -397,7 +398,7 @@ async function procesarAltaCurso() {
             publicado,
             fecha_publicacion);
 
-        let respuesta = await oEmpresa.altaCurso(curso);
+        let respuesta = id ? await oEmpresa.actualizarCurso(curso) : await oEmpresa.altaCurso(curso);
 
         alert(respuesta.mensaje);
 
@@ -555,3 +556,24 @@ async function procesarListadoCursos() {
     document.querySelector("#listados").innerHTML = listado;
 }
 
+async function procesarAccionTablaCursos(oEvento) {
+    // closest sube desde donde se hizo clic (botón o icono) hasta el botón
+    let botonEditar = oEvento.target.closest(".btn-editar");
+    let botonBorrar = oEvento.target.closest(".btn-borrar");
+
+    if (botonEditar) {
+        await oEmpresa.editarCurso(botonEditar);
+    } else if (botonBorrar) {
+        let id = botonBorrar.dataset.id;
+
+        if (confirm("¿Seguro que quieres borrar este curso?")) {
+            let respuesta = await oEmpresa.borrarCurso(id);
+            alert(respuesta.mensaje);
+
+            if (respuesta.ok) {
+                botonBorrar.closest("tr").remove();
+            }
+        }
+    }
+    // si no es ninguno de los dos, se ignora el clic
+}

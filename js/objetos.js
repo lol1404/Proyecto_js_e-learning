@@ -360,4 +360,54 @@ class Empresa {
 
         return respuesta;
     }
+
+
+
+    async editarCurso(boton) {
+    let curso = JSON.parse(boton.dataset.curso);
+
+    ocultarFormularios();
+    frmAltaCurso.classList.remove("d-none");
+
+    frmAltaCurso.querySelector("legend").textContent = "Editar curso";
+    frmAltaCurso.btnAceptarAltaCurso.value = "Guardar cambios";
+
+    frmAltaCurso.txtIdCurso.value = curso.id;
+    frmAltaCurso.txtAltaCursoTitulo.value = curso.titulo;
+    frmAltaCurso.txtAltaCursoDescripcion.value = curso.descripcion;
+    frmAltaCurso.lstAltaCursoNivel.value = curso.nivel;
+    frmAltaCurso.txtAltaCursoHoras.value = curso.duracion_horas;
+    frmAltaCurso.txtAltaCursoPrecio.value = curso.precio;
+    frmAltaCurso.chkAltaCursoPublicado.checked = parseInt(curso.publicado, 10) === 1;
+    frmAltaCurso.txtAltaCursoFecha.value = curso.fecha_publicacion;
+
+    await actualizarDesplegableCategoria(curso.categoria_id);
+}
+
+
+
+    async borrarCurso(id) {
+        let datos = new FormData();
+        datos.append("id", id);
+
+        return await peticionPOST("borrar_curso.php", datos);
+    }
+
+
+    async actualizarCurso(oCurso) {
+        let datos = new FormData();
+
+        datos.append("id", oCurso.id);
+        datos.append("categoria_id", oCurso.categoria_id);
+        datos.append("titulo", oCurso.titulo);
+        datos.append("descripcion", oCurso.descripcion);
+        datos.append("nivel", oCurso.nivel);
+        datos.append("duracion_horas", oCurso.duracion_horas);
+        datos.append("precio", oCurso.precio);
+        datos.append("publicado", oCurso.publicado ? 1 : 0);
+        datos.append("fecha_publicacion", oCurso.fecha_publicacion);
+
+        let respuesta = await peticionPOST("editar_curso.php", datos);
+        return respuesta;
+    }
 }
