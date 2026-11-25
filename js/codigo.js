@@ -2,7 +2,7 @@
 
 
 
-var oEmpresa = new Empresa();
+var oEmpresa = new EmpresaLecciones();
 
 registrarEventos();
 
@@ -28,6 +28,25 @@ function registrarEventos() {
     document
         .querySelector("#mnuListC")
         .addEventListener("click", procesarListadoCategorias);
+
+
+
+    // Cursos ---------------------
+    document
+        .querySelector("#mnuAltaCurso")
+        .addEventListener("click", mostrarFormulario);
+
+    document
+        .querySelector("#mnuBuscarCurso")
+        .addEventListener("click", mostrarFormulario);
+
+    document
+        .querySelector("#mnuListadoCursoCategoria")
+        .addEventListener("click", mostrarFormulario);
+
+    document
+        .querySelector("#mnuListadoCurso")
+        .addEventListener("click", procesarListadoCursos);
 
     // Botones --------------------
 
@@ -55,6 +74,22 @@ function registrarEventos() {
     document.querySelector("#btnBuscarModulo").addEventListener("click", procesarBuscarModulo);
     document.querySelector("#btnBuscarModuloFecha").addEventListener("click", procesarBuscarModuloPorFecha);
     document.querySelector("#listadosModulo").addEventListener("click", procesarAccionTablaModulo);
+
+
+    // Botones cursos -------------------
+    document
+    frmAltaCurso.btnAceptarAltaCurso.addEventListener("click", procesarAltaCurso)
+
+    document
+    frmBuscarcurso.btnAceptarBuscarCurso.addEventListener("click", () => procesarBuscarCurso(false))
+
+    document
+    frmBuscarcursocategoria.btnBuscarCursoCategoria.addEventListener("click", () => procesarBuscarCurso(true))
+
+    document
+        .querySelector("#listados")
+        .addEventListener("click", procesarAccionTablaCursos);
+
 }
 
 function mostrarFormulario(oEvento) {
@@ -95,6 +130,18 @@ function mostrarFormulario(oEvento) {
             frmBuscarModuloFecha.reset();
             frmBuscarModuloFecha.classList.remove("d-none");
             break;
+        case "mnuAltaCurso":
+            frmAltaCurso.reset();
+            frmAltaCurso.classList.remove("d-none");
+            actualizarDesplegableCategoria(undefined);
+            break;
+        case "mnuBuscarCurso":
+            frmBuscarcurso.classList.remove("d-none");
+            break;
+        case "mnuListadoCursoCategoria":
+            frmBuscarcursocategoria.classList.remove("d-none");
+            actualizarDesplegableCategoria(undefined);
+            break;
     }
 }
 
@@ -113,6 +160,12 @@ function ocultarFormularios() {
 
     frmAltaLeccion.classList.add("d-none");
     frmBuscarLeccion.classList.add("d-none");
+
+    frmAltaCurso.classList.add("d-none");
+
+    frmBuscarcurso.classList.add("d-none");
+
+    frmBuscarcursocategoria.classList.add("d-none");
 }
 
 async function procesarListadoCategorias() {
@@ -271,9 +324,6 @@ async function procesarBuscarCategorias(fecha) {
         respuesta = await oEmpresa.buscarCategoria(aBuscar);
     }
 
-
-
-
     listados.classList.remove("d-none");
 
     let listado = '<table class="table table-striped" id="tablaCategorias">';
@@ -312,6 +362,10 @@ async function procesarBuscarCategorias(fecha) {
 }
 
 async function procesarAccionTabla(oEvento) {
+    if (!oEvento.target.closest("#tablaCategorias")) {
+        return;
+    }
+
     // closest sube desde donde se hizo clic (botón o icono) hasta el botón
     let botonEditar = oEvento.target.closest(".btn-editar");
     let botonBorrar = oEvento.target.closest(".btn-borrar");
@@ -507,6 +561,69 @@ async function procesarAccionTablaModulo(evento) {
         alert(respuesta.mensaje);
         if (respuesta.ok) {
             botonBorrar.closest("tr").remove();
+        }
+    }
+}
+async function actualizarDesplegableCategoria(id_categoria) {
+    let respuesta = await oEmpresa.getCategoriasCursos();
+    let options = "";
+
+    for (let categoria of respuesta.datos) {
+        if (id_categoria && id_categoria == categoria.id) {
+            // Si llega el parámetro ( != undefined )
+            options +=
+                "<option selected value='" +
+                categoria.id +
+                "' >" +
+                categoria.nombre +
+                "</option>";
+        } else {
+            options +=
+                "<option value='" + categoria.id + "' >" + categoria.nombre + "</option>";
+        }
+    }
+    // Agrego los options generados a partir del contenido de la BD en todos los desplegables
+    frmAltaCurso.lstAltaCursoCategoria.innerHTML = options;
+    frmBuscarcursocategoria.lstCategoria.innerHTML = options;
+}
+
+
+
+
+
+async function procesarAltaCurso() {
+    if (validarAltaCurso()) {
+        let id = frmAltaCurso.txtIdCurso.value;
+        let categoria_id = frmAltaCurso.lstAltaCursoCategoria.value;
+        let titulo = frmAltaCurso.txtAltaCursoTitulo.value.trim();
+        let descripcion = frmAltaCurso.txtAltaCursoDescripcion.value.trim();
+        let nivel = frmAltaCurso.lstAltaCursoNivel.value;
+        let duracion_horas = frmAltaCurso.txtAltaCursoHoras.value;
+        let precio = frmAltaCurso.txtAltaCursoPrecio.value;
+        let publicado = frmAltaCurso.chkAltaCursoPublicado.checked;
+        let fecha_publicacion = frmAltaCurso.txtAltaCursoFecha.value;
+
+
+        let curso = new Curso(id || null,
+            categoria_id,
+            titulo,
+            descripcion,
+            nivel,
+            duracion_horas,
+            precio,
+            publicado,
+            fecha_publicacion);
+
+        let respuesta = id ? await oEmpresa.actualizarCurso(curso) : await oEmpresa.altaCurso(curso);
+
+        alert(respuesta.mensaje);
+
+        if (respuesta.ok) {
+            // Si NO hay error
+            //Resetear formulario
+            frmAltaCurso.reset();
+            // Ocultar el formulario
+            frmAltaCurso.classList.add("d-none");
         }
     }
 }
@@ -758,4 +875,174 @@ function escaparHTML(valor) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;");
+}
+
+
+function validarAltaCurso() {
+    let titulo = frmAltaCurso.txtAltaCursoTitulo.value.trim();
+    let descripcion = frmAltaCurso.txtAltaCursoDescripcion.value.trim();
+    let duracion_horas = frmAltaCurso.txtAltaCursoHoras.value;
+    let precio = frmAltaCurso.txtAltaCursoPrecio.value;
+    let publicado = frmAltaCurso.chkAltaCursoPublicado.checked;
+    let fecha_publicacion = frmAltaCurso.txtAltaCursoFecha.value;
+    let errores = [];
+
+    if (!titulo) {
+        errores.push("El nombre es obligatorio.");
+    } else if (titulo.length > 150) {
+        errores.push("El nombre no puede superar los 150 caracteres.");
+    }
+
+    if (!descripcion) {
+        errores.push("La descripción es obligatoria.");
+    }
+
+    if (!Number.isSafeInteger(Number(duracion_horas)) || Number(duracion_horas) < 1) {
+        errores.push("La duración debe ser un número entero mayor que cero.");
+    }
+
+    if (precio === "" || precio < 0) {
+        errores.push("El precio debe ser un número válido mayor o igual que cero.");
+    }
+
+    if (publicado && !fecha_publicacion) {
+        errores.push("La fecha de publicación es obligatoria si el curso está publicado.");
+    } else if (!fecha_publicacion){
+        errores.push("La cadena de fecha no puede estar vacía")
+    }
+
+    if (errores.length > 0) {
+        alert(errores.join("\n"));
+        return false;
+    }
+
+    return true;
+}
+
+
+
+
+
+async function procesarBuscarCurso(categoria) {
+    let respuesta;
+
+    if (categoria) {
+        let categoriaABuscar = frmBuscarcursocategoria.lstCategoria.value.trim();
+        // Obtener el listado de componentes por categoria
+        respuesta = await oEmpresa.buscarCursosCategoria(categoriaABuscar);
+
+    } else {
+        let aBuscar = frmBuscarcurso.txtTituloCurso.value.trim();
+        // Obtener el listado de componentes
+        respuesta = await oEmpresa.buscarCurso(aBuscar);
+    }
+
+    ocultarFormularios();
+    listados.classList.remove("d-none");
+
+    let listado = '<table class="table table-striped" id="tablaCursos">';
+    listado +=
+        "<thead><tr><th>ID</th><th>CATEGORIA</th><th>TITULO</th><th>DESCRIPCION</th><th>NIVEL</th><th>DURACION(h)</th><th>PRECIO</th><th>PUBLICADO</th><th>FECHA PUBLICACIO</th><th>ACCIONES</th></tr></thead>";
+    listado += "<tbody>";
+
+    for (let fila of respuesta.datos) {
+    listado += "<tr><td>" + fila.id + "</td>";
+    listado += "<td>" + fila.categorias + "</td>";
+    listado += "<td>" + fila.titulo + "</td>";
+    listado += "<td>" + fila.descripcion + "</td>";
+    listado += "<td>" + fila.nivel + "</td>";
+    listado += "<td>" + fila.duracion_horas + "</td>";
+    listado += "<td>" + fila.precio + "</td>";
+
+    if (parseInt(fila.publicado) === 1) {
+        listado += "<td class='table-success'>SI</td>";
+    } else {
+        listado += "<td class='table-danger'>NO</td>";
+    }
+
+    listado += "<td>" + (fila.fecha_publicacion ?? "") + "</td>";
+
+    listado +=
+        "<td>" +
+        "<button class='btn btn-primary btn-editar' data-curso='" + JSON.stringify(fila) + "'>" +
+        "<i class='bi bi-pencil-square'></i></button> " +
+        "<button class='btn btn-danger btn-borrar' data-id='" + fila.id + "'>" +
+        "<i class='bi bi-trash'></i></button>" +
+        "</td>";
+
+    listado += "</tr>";
+}
+
+    listado += "</tbody></table>";
+    document.querySelector("#listados").innerHTML = listado;
+}
+
+async function procesarListadoCursos() {
+    // Obtener el listado de componentes
+    let respuesta = await oEmpresa.listadoCursos();
+
+    ocultarFormularios();
+    listados.classList.remove("d-none");
+
+    let listado = '<table class="table table-striped" id="tablaCursos">';
+    listado +=
+        "<thead><tr><th>ID</th><th>CATEGORIA</th><th>TITULO</th><th>DESCRIPCION</th><th>NIVEL</th><th>DURACION(h)</th><th>PRECIO</th><th>PUBLICADO</th><th>FECHA PUBLICACIO</th><th>ACCIONES</th></tr></thead>";
+    listado += "<tbody>";
+
+    for (let fila of respuesta.datos) {
+    listado += "<tr><td>" + fila.id + "</td>";
+    listado += "<td>" + fila.categorias + "</td>";
+    listado += "<td>" + fila.titulo + "</td>";
+    listado += "<td>" + fila.descripcion + "</td>";
+    listado += "<td>" + fila.nivel + "</td>";
+    listado += "<td>" + fila.duracion_horas + "</td>";
+    listado += "<td>" + fila.precio + "</td>";
+
+    if (parseInt(fila.publicado) === 1) {
+        listado += "<td class='table-success'>SI</td>";
+    } else {
+        listado += "<td class='table-danger'>NO</td>";
+    }
+
+    listado += "<td>" + (fila.fecha_publicacion ?? "") + "</td>";
+
+    listado +=
+        "<td>" +
+        "<button class='btn btn-primary btn-editar' data-curso='" + JSON.stringify(fila) + "'>" +
+        "<i class='bi bi-pencil-square'></i></button> " +
+        "<button class='btn btn-danger btn-borrar' data-id='" + fila.id + "'>" +
+        "<i class='bi bi-trash'></i></button>" +
+        "</td>";
+
+    listado += "</tr>";
+}
+
+    listado += "</tbody></table>";
+    document.querySelector("#listados").innerHTML = listado;
+}
+
+async function procesarAccionTablaCursos(oEvento) {
+    if (!oEvento.target.closest("#tablaCursos")) {
+        return;
+    }
+
+    // closest sube desde donde se hizo clic (botón o icono) hasta el botón
+    let botonEditar = oEvento.target.closest(".btn-editar");
+    let botonBorrar = oEvento.target.closest(".btn-borrar");
+
+    if (botonEditar) {
+        await oEmpresa.editarCurso(botonEditar);
+    } else if (botonBorrar) {
+        let id = botonBorrar.dataset.id;
+
+        if (confirm("¿Seguro que quieres borrar este curso?")) {
+            let respuesta = await oEmpresa.borrarCurso(id);
+            alert(respuesta.mensaje);
+
+            if (respuesta.ok) {
+                botonBorrar.closest("tr").remove();
+            }
+        }
+    }
+    // si no es ninguno de los dos, se ignora el clic
 }

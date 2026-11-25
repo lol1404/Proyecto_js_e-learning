@@ -4,7 +4,11 @@ require_once(__DIR__ . '/config.php');
 
 try {
     $conexion = obtenerConexion();
-    $resultado = $conexion->query("SELECT id, titulo FROM cursos ORDER BY titulo, id");
+    $sql = "SELECT cursos.*, categorias.nombre AS categorias
+            FROM cursos
+            INNER JOIN categorias ON cursos.categoria_id = categorias.id
+            ORDER BY cursos.titulo, cursos.id";
+    $resultado = $conexion->query($sql);
     if (!$resultado) {
         throw new mysqli_sql_exception('Error al consultar cursos: ' . $conexion->error);
     }
